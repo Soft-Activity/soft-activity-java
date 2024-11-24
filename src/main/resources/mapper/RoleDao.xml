@@ -49,7 +49,7 @@
     <select id="queryByUserId" resultType="homework.soft.activity.entity.po.Role" parameterType="java.lang.String">
         select r.*
         from role r
-                 join user_role ur on ur.user_id = #{userId}
+                 join user_role ur on r.role_id=ur.role_id where ur.user_id=#{userId}
     </select>
 
 

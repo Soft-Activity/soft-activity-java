@@ -1,7 +1,10 @@
 package homework.soft.activity.util;
 
 import com.alibaba.fastjson2.JSON;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -25,6 +28,9 @@ import java.util.stream.Collectors;
 
 public class HttpRequestUtils {
     @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Params {
         private String url;
         private String contentType;

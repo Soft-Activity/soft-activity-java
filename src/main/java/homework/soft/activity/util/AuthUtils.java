@@ -1,39 +1,13 @@
 package homework.soft.activity.util;
 
-import homework.soft.activity.constant.JwtClaimsConstant;
+
 import homework.soft.activity.constant.enums.RoleType;
 import homework.soft.activity.context.CurrentUserContext;
 import homework.soft.activity.entity.po.Role;
 import homework.soft.activity.entity.vo.UserVO;
-import homework.soft.activity.property.AppProperty;
-import homework.soft.activity.service.UserService;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class AuthUtils {
-    @Resource
-    private UserService userService;
-    private static UserService service;
-
-    @Resource(name = "appProperty")
-    private AppProperty _appProperty;
-    private static AppProperty appProperty;
-
-    @PostConstruct
-    public void init() {
-        AuthUtils.service = this.userService;
-        AuthUtils.appProperty = this._appProperty;
-    }
-
-
-    public static String createJwtToken(String userId) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put(JwtClaimsConstant.USER_ID, userId);
-        return JwtUtils.createJWT(appProperty.getJwt().getSecretKey(), appProperty.getJwt().getTtl(), payload);
-    }
 
     public static UserVO getUserDetails() {
         return CurrentUserContext.getCurrentUser();
@@ -48,7 +22,7 @@ public class AuthUtils {
     }
 
     /**
-     * 是否有权限访问
+     * 用户是否登录
      *
      * @return 是否
      */

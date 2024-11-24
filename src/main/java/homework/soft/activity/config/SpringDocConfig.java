@@ -15,6 +15,6 @@ public class SpringDocConfig {
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI(SpecVersion.V30)
-                .info(new Info().title("活动申请x").description("活动申请后台"));
+                .info(new Info().title("活动申请").description("活动申请后台"));
     }
 }

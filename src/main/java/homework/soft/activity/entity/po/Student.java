@@ -5,6 +5,8 @@ import lombok.Data;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.EqualsAndHashCode;
+
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -15,6 +17,7 @@ import java.io.Serializable;
  * @since 2024-11-24 15:00:02
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class Student implements Serializable {
     @Serial
     private static final long serialVersionUID = -76004887998213437L;

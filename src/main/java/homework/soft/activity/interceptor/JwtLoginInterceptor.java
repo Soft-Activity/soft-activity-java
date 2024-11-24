@@ -54,7 +54,7 @@ public class JwtLoginInterceptor implements HandlerInterceptor {
             //2.1 校验令牌
             Claims payload = null;
             try {
-                payload = JwtUtils.parseJWT(appProperty.getJwt().getTokenName(), token);
+                payload = JwtUtils.parseJWT(appProperty.getJwt().getSecretKey(), token);
             } catch (Exception ignored) {
 
             }

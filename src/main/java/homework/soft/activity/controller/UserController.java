@@ -1,9 +1,12 @@
 package homework.soft.activity.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import homework.soft.activity.annotation.PermissionAuthorize;
 import homework.soft.activity.constant.enums.RoleType;
-import homework.soft.activity.entity.dto.UserQuery;
+import homework.soft.activity.entity.dto.*;
+import homework.soft.activity.entity.po.Student;
 import homework.soft.activity.entity.po.User;
+import homework.soft.activity.entity.vo.UserAuthVO;
 import homework.soft.activity.entity.vo.UserVO;
 import homework.soft.activity.service.UserService;
 import homework.soft.activity.util.AuthUtils;
@@ -13,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import jakarta.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +36,7 @@ public class UserController {
 
     @Operation(summary = "获取指定用户信息")
     @GetMapping("/info/{id}")
+    @PermissionAuthorize(RoleType.SUPER_ADMIN)
     public CommonResult<UserVO> getUser(@PathVariable String id) {
         UserVO vo = userService.queryById(id);
         return vo != null ? CommonResult.success(vo) : CommonResult.error(HttpStatus.NOT_FOUND);
@@ -50,13 +55,14 @@ public class UserController {
 
     @Operation(summary = "添加用户")
     @PostMapping("/add")
+    @PermissionAuthorize(RoleType.SUPER_ADMIN)
     public CommonResult<Boolean> addUser(@RequestBody User param) {
         return userService.save(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
 
     @Operation(summary = "修改指定用户信息")
     @PutMapping("/update/{id}")
-    @PermissionAuthorize(RoleType.SUPER_ADMIN)
+    @PermissionAuthorize
     public CommonResult<Boolean> updateUser(@PathVariable String id, @RequestBody User param) {
         param.setUserId(id);
         return userService.updateById(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
@@ -69,11 +75,42 @@ public class UserController {
         return userService.removeById(id) ? CommonResult.success(true) : CommonResult.error(HttpStatus.NOT_FOUND);
     }
 
+    //用户个人功能软件
     @Operation(summary = "获取当前用户信息")
     @GetMapping("/current")
     public CommonResult<UserVO> getCurrentUser() {
         UserVO vo = AuthUtils.getUserDetails();
         return CommonResult.success(vo);
+    }
+
+    @Operation(summary = "用户账号密码登录")
+    @PostMapping("/login-by-password")
+    public CommonResult<UserAuthVO> loginByPassword(@RequestBody @Validated UserPasswordLoginDTO param) {
+        UserAuthVO auth = userService.loginByPassword(param.getUserId(), param.getPassword());
+        return CommonResult.success(auth);
+    }
+
+    @Operation(summary = "用户微信登录")
+    @PostMapping("/login-by-wx")
+    public CommonResult<UserAuthVO> loginByWX(@RequestBody @Validated UserWXLoginDTO param) {
+        UserAuthVO auth = userService.loginByWX(param.getCode());
+        return CommonResult.success(auth);
+    }
+
+    @Operation(summary = "微信用户通过账号密码绑定账号")
+    @PostMapping("/bind-wx-by-password")
+    public CommonResult<UserAuthVO> bindWxByPassword(@RequestBody @Validated UserWXPasswordBindDTO param) {
+        UserAuthVO auth = userService.bindWxByPassword(param.getCode(), param.getUserId(), param.getPassword());
+        return CommonResult.success(auth);
+    }
+
+    @Operation(summary = "微信用户通过学生信息绑定账号")
+    @PostMapping("/bind-wx-by-student-info")
+    public CommonResult<UserAuthVO> bindWxByStudentInfo(@RequestBody @Validated UserWXStudentBindDTO param) {
+        Student student = new Student();
+        BeanUtil.copyProperties(param, student);
+        UserAuthVO auth = userService.bindWxByStudentInfo(param.getCode(), student);
+        return CommonResult.success(auth);
     }
 
 }

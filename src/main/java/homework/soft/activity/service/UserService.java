@@ -2,9 +2,12 @@ package homework.soft.activity.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import homework.soft.activity.entity.po.Student;
 import homework.soft.activity.entity.po.User;
 import homework.soft.activity.entity.dto.UserQuery;
+import homework.soft.activity.entity.vo.UserAuthVO;
 import homework.soft.activity.entity.vo.UserVO;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
@@ -41,5 +44,12 @@ public interface UserService extends IService<User> {
      */
     int count(UserQuery param);
 
+    UserAuthVO loginByPassword( String userId, String password);
+
+    UserAuthVO loginByWX(String code);
+
+    UserAuthVO bindWxByPassword(String code,String userId, String password);
+
+    UserAuthVO bindWxByStudentInfo(String code, Student student);
 }
 
