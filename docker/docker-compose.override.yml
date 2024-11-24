@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  mysql:
+    ports:
+      - "3307:3306"
+  redis:
+    ports:
+      - "6380:6379"
+
+volumes:
+  mysql-conf:
+  mysql-data:
+  mysql-logs:
+
+  redis-conf:
+  redis-data:
+  redis-logs:
+
+networks:
+  xszs:

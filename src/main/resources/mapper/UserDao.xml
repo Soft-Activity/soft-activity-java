@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homework.soft.activity.dao.UserDao">
+
+
+    <resultMap id="UserMap" type="homework.soft.activity.entity.po.User">
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="college" column="college" jdbcType="VARCHAR"/>
+        <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+        <result property="gender" column="gender" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <resultMap id="UserVOMap" type="homework.soft.activity.entity.vo.UserVO" extends="UserMap" autoMapping="true"/>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserVOMap">
+        select *
+        from `user`
+        where `user_id` = #{userId}
+    </select>
+
+     <!--筛选条件-->
+   <sql id="queryCondition">
+        <where>
+            <if test="userId != null and userId != ''">
+                and `user_id` = #{userId}
+            </if>
+            <if test="name != null and name != ''">
+                and `name` = #{name}
+            </if>
+            <if test="college != null and college != ''">
+                and `college` = #{college}
+            </if>
+            <if test="avatar != null and avatar != ''">
+                and `avatar` = #{avatar}
+            </if>
+            <if test="gender != null and gender != ''">
+                and `gender` = #{gender}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="UserVOMap">
+        select *
+        from `user`
+        <include refid="queryCondition"/>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(1)
+        from `user`
+        <include refid="queryCondition"/>
+    </select>
+ 
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="userId" useGeneratedKeys="true">
+        insert into user(name,college,avatar,gender)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.name},#{entity.college},#{entity.avatar},#{entity.gender})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="userId" useGeneratedKeys="true">
+        insert into user(name,college,avatar,gender)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.name},#{entity.college},#{entity.avatar},#{entity.gender})
+        </foreach>
+        on duplicate key update
+           name = values(name) ,
+           college = values(college) ,
+           avatar = values(avatar) ,
+           gender = values(gender)     
+    </insert>
+
+</mapper>
+

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homework.soft.activity.dao.UserRoleDao">
+
+
+    <resultMap id="UserRoleMap" type="homework.soft.activity.entity.po.UserRole">
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="roleId" column="role_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="UserRoleVOMap" type="homework.soft.activity.entity.vo.UserRoleVO" extends="UserRoleMap"
+               autoMapping="true"/>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserRoleVOMap">
+        select *
+        from `user_role`
+        where `user_id` = #{userId}
+    </select>
+
+    <!--筛选条件-->
+    <sql id="queryCondition">
+        <where>
+            <if test="userId != null and userId != ''">
+                and `user_id` = #{userId}
+            </if>
+            <if test="roleId != null">
+                and `role_id` = #{roleId}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="UserRoleVOMap">
+        select *
+        from `user_role`
+        <include refid="queryCondition"/>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(1)
+        from `user_role`
+        <include refid="queryCondition"/>
+    </select>
+
+    <delete id="deleteByUserId">
+        delete from `user_role` where user_id=#{userId}
+    </delete>
+
+</mapper>
+

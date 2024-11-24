@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homework.soft.activity.dao.RoleDao">
+
+
+    <resultMap id="RoleMap" type="homework.soft.activity.entity.po.Role">
+        <result property="roleId" column="role_id" jdbcType="INTEGER"/>
+        <result property="cname" column="cname" jdbcType="VARCHAR"/>
+        <result property="ename" column="ename" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="RoleVOMap" type="homework.soft.activity.entity.vo.RoleVO" extends="RoleMap" autoMapping="true"/>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="RoleVOMap">
+        select *
+        from `role`
+        where `role_id` = #{roleId}
+    </select>
+
+    <!--筛选条件-->
+    <sql id="queryCondition">
+        <where>
+            <if test="roleId != null">
+                and `role_id` = #{roleId}
+            </if>
+            <if test="cname != null and cname != ''">
+                and `cname` = #{cname}
+            </if>
+            <if test="ename != null and ename != ''">
+                and `ename` = #{ename}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="RoleVOMap">
+        select *
+        from `role`
+        <include refid="queryCondition"/>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(1)
+        from `role`
+        <include refid="queryCondition"/>
+    </select>
+    <select id="queryByUserId" resultType="homework.soft.activity.entity.po.Role" parameterType="java.lang.String">
+        select r.*
+        from role r
+                 join user_role ur on ur.user_id = #{userId}
+    </select>
+
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="roleId" useGeneratedKeys="true">
+        insert into role(cname,ename)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.cname},#{entity.ename})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="roleId" useGeneratedKeys="true">
+        insert into role(cname,ename)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.cname},#{entity.ename})
+        </foreach>
+        on duplicate key update
+        cname = values(cname) ,
+        ename = values(ename)
+    </insert>
+
+</mapper>
+
