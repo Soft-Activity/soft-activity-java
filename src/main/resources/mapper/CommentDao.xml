@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homework.soft.activity.dao.CommentDao">
+
+
+    <resultMap id="CommentMap" type="homework.soft.activity.entity.po.Comment">
+        <result property="commentId" column="comment_id" jdbcType="INTEGER"/>
+        <result property="activityId" column="activity_id" jdbcType="INTEGER"/>
+        <result property="studentId" column="student_id" jdbcType="VARCHAR"/>
+        <result property="rating" column="rating" jdbcType="INTEGER"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    
+    <resultMap id="CommentVOMap" type="homework.soft.activity.entity.vo.CommentVO" extends="CommentMap" autoMapping="true"/>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="CommentVOMap">
+        select *
+        from `comment`
+        where `comment_id` = #{commentId}
+    </select>
+
+     <!--筛选条件-->
+   <sql id="queryCondition">
+        <where>
+            <if test="commentId != null">
+                and `comment_id` = #{commentId}
+            </if>
+            <if test="activityId != null">
+                and `activity_id` = #{activityId}
+            </if>
+            <if test="studentId != null and studentId != ''">
+                and `student_id` = #{studentId}
+            </if>
+            <if test="rating != null">
+                and `rating` = #{rating}
+            </if>
+            <if test="content != null and content != ''">
+                and `content` = #{content}
+            </if>
+            <if test="createTime != null">
+                and `create_time` = #{createTime}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="CommentVOMap">
+        select *
+        from `comment`
+        <include refid="queryCondition"/>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(1)
+        from `comment`
+        <include refid="queryCondition"/>
+    </select>
+ 
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="commentId" useGeneratedKeys="true">
+        insert into comment(activity_id,student_id,rating,content,create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.activityId},#{entity.studentId},#{entity.rating},#{entity.content},#{entity.createTime})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="commentId" useGeneratedKeys="true">
+        insert into comment(activity_id,student_id,rating,content,create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.activityId},#{entity.studentId},#{entity.rating},#{entity.content},#{entity.createTime})
+        </foreach>
+        on duplicate key update
+           activity_id = values(activity_id) ,
+           student_id = values(student_id) ,
+           rating = values(rating) ,
+           content = values(content) ,
+           create_time = values(create_time)     
+    </insert>
+
+</mapper>
+

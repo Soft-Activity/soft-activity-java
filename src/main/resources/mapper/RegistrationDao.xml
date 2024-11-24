@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homework.soft.activity.dao.RegistrationDao">
+
+
+    <resultMap id="RegistrationMap" type="homework.soft.activity.entity.po.Registration">
+        <result property="registrationId" column="registration_id" jdbcType="INTEGER"/>
+        <result property="studentId" column="student_id" jdbcType="VARCHAR"/>
+        <result property="activityId" column="activity_id" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    
+    <resultMap id="RegistrationVOMap" type="homework.soft.activity.entity.vo.RegistrationVO" extends="RegistrationMap" autoMapping="true"/>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="RegistrationVOMap">
+        select *
+        from `registration`
+        where `registration_id` = #{registrationId}
+    </select>
+
+     <!--筛选条件-->
+   <sql id="queryCondition">
+        <where>
+            <if test="registrationId != null">
+                and `registration_id` = #{registrationId}
+            </if>
+            <if test="studentId != null and studentId != ''">
+                and `student_id` = #{studentId}
+            </if>
+            <if test="activityId != null">
+                and `activity_id` = #{activityId}
+            </if>
+            <if test="status != null">
+                and `status` = #{status}
+            </if>
+            <if test="createTime != null">
+                and `create_time` = #{createTime}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="RegistrationVOMap">
+        select *
+        from `registration`
+        <include refid="queryCondition"/>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(1)
+        from `registration`
+        <include refid="queryCondition"/>
+    </select>
+ 
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="registrationId" useGeneratedKeys="true">
+        insert into registration(student_id,activity_id,status,create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.studentId},#{entity.activityId},#{entity.status},#{entity.createTime})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="registrationId" useGeneratedKeys="true">
+        insert into registration(student_id,activity_id,status,create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.studentId},#{entity.activityId},#{entity.status},#{entity.createTime})
+        </foreach>
+        on duplicate key update
+           student_id = values(student_id) ,
+           activity_id = values(activity_id) ,
+           status = values(status) ,
+           create_time = values(create_time)     
+    </insert>
+
+</mapper>
+

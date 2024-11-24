@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homework.soft.activity.dao.StudentDao">
+
+
+    <resultMap id="StudentMap" type="homework.soft.activity.entity.po.Student">
+        <result property="studentId" column="student_id" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="college" column="college" jdbcType="VARCHAR"/>
+        <result property="classes" column="classes" jdbcType="VARCHAR"/>
+        <result property="grade" column="grade" jdbcType="INTEGER"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="gender" column="gender" jdbcType="VARCHAR"/>
+        <result property="isVerified" column="is_verified" jdbcType="BOOLEAN"/>
+    </resultMap>
+    
+    <resultMap id="StudentVOMap" type="homework.soft.activity.entity.vo.StudentVO" extends="StudentMap" autoMapping="true"/>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="StudentVOMap">
+        select *
+        from `student`
+        where `student_id` = #{studentId}
+    </select>
+
+     <!--筛选条件-->
+   <sql id="queryCondition">
+        <where>
+            <if test="studentId != null and studentId != ''">
+                and `student_id` = #{studentId}
+            </if>
+            <if test="name != null and name != ''">
+                and `name` = #{name}
+            </if>
+            <if test="college != null and college != ''">
+                and `college` = #{college}
+            </if>
+            <if test="classes != null and classes != ''">
+                and `classes` = #{classes}
+            </if>
+            <if test="grade != null">
+                and `grade` = #{grade}
+            </if>
+            <if test="type != null and type != ''">
+                and `type` = #{type}
+            </if>
+            <if test="gender != null and gender != ''">
+                and `gender` = #{gender}
+            </if>
+            <if test="isVerified != null">
+                and `is_verified` = #{isVerified}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="StudentVOMap">
+        select *
+        from `student`
+        <include refid="queryCondition"/>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(1)
+        from `student`
+        <include refid="queryCondition"/>
+    </select>
+ 
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="studentId" useGeneratedKeys="true">
+        insert into student(name,college,classes,grade,type,gender,is_verified)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.name},#{entity.college},#{entity.classes},#{entity.grade},#{entity.type},#{entity.gender},#{entity.isVerified})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="studentId" useGeneratedKeys="true">
+        insert into student(name,college,classes,grade,type,gender,is_verified)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.name},#{entity.college},#{entity.classes},#{entity.grade},#{entity.type},#{entity.gender},#{entity.isVerified})
+        </foreach>
+        on duplicate key update
+           name = values(name) ,
+           college = values(college) ,
+           classes = values(classes) ,
+           grade = values(grade) ,
+           type = values(type) ,
+           gender = values(gender) ,
+           is_verified = values(is_verified)     
+    </insert>
+
+</mapper>
+

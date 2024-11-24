@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homework.soft.activity.dao.ActivityCategoryDao">
+
+
+    <resultMap id="ActivityCategoryMap" type="homework.soft.activity.entity.po.ActivityCategory">
+        <result property="categoryId" column="category_id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <resultMap id="ActivityCategoryVOMap" type="homework.soft.activity.entity.vo.ActivityCategoryVO" extends="ActivityCategoryMap" autoMapping="true"/>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ActivityCategoryVOMap">
+        select *
+        from `activity_category`
+        where `category_id` = #{categoryId}
+    </select>
+
+     <!--筛选条件-->
+   <sql id="queryCondition">
+        <where>
+            <if test="categoryId != null">
+                and `category_id` = #{categoryId}
+            </if>
+            <if test="name != null and name != ''">
+                and `name` = #{name}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="ActivityCategoryVOMap">
+        select *
+        from `activity_category`
+        <include refid="queryCondition"/>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(1)
+        from `activity_category`
+        <include refid="queryCondition"/>
+    </select>
+ 
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="categoryId" useGeneratedKeys="true">
+        insert into activity_category(name)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.name})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="categoryId" useGeneratedKeys="true">
+        insert into activity_category(name)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.name})
+        </foreach>
+        on duplicate key update
+           name = values(name)     
+    </insert>
+
+</mapper>
+
