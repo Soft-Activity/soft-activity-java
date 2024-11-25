@@ -151,6 +151,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
+    @Transactional
     public UserAuthVO bindWxByStudentInfo(String code, Student student) {
 
         String userId = student.getStudentId();
@@ -168,10 +169,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         String openId = getOpenIdByCode(code);
         AssertUtils.isTrue(StringUtils.isNotBlank(openId), HttpStatus.INTERNAL_SERVER_ERROR, "微信登录失败");
         //5.更新账号信息
-        LambdaUpdateWrapper<Account> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.set(Account::getOpenId, openId).eq(Account::getUserId, userId);
-        AssertUtils.isTrue(accountService.update(updateWrapper), HttpStatus.INTERNAL_SERVER_ERROR, "绑定失败");
-        //6.返回信息
+        LambdaUpdateWrapper<Account> updateAccount = new LambdaUpdateWrapper<>();
+        updateAccount.set(Account::getOpenId, openId).eq(Account::getUserId, userId);
+        AssertUtils.isTrue(accountService.update(updateAccount), HttpStatus.INTERNAL_SERVER_ERROR, "绑定失败");
+        //6.更新认证状态
+        LambdaUpdateWrapper<Student> updateStudent = new LambdaUpdateWrapper<>();
+        updateStudent.set(Student::getIsVerified,true).eq(Student::getStudentId, userId);
+        AssertUtils.isTrue(studentService.update(updateStudent),HttpStatus.INTERNAL_SERVER_ERROR,"绑定失败");
+
+        //7.返回信息
         String token = JwtUtils.createJWTByUserId(account.getUserId());
 
         return new UserAuthVO(token);
