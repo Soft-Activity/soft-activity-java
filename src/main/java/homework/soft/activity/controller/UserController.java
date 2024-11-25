@@ -3,22 +3,28 @@ package homework.soft.activity.controller;
 import cn.hutool.core.bean.BeanUtil;
 import homework.soft.activity.annotation.PermissionAuthorize;
 import homework.soft.activity.constant.enums.RoleType;
+import homework.soft.activity.constant.enums.UploadModule;
 import homework.soft.activity.entity.dto.*;
 import homework.soft.activity.entity.po.Student;
 import homework.soft.activity.entity.po.User;
 import homework.soft.activity.entity.vo.UserAuthVO;
 import homework.soft.activity.entity.vo.UserVO;
 import homework.soft.activity.service.UserService;
+import homework.soft.activity.util.AssertUtils;
 import homework.soft.activity.util.AuthUtils;
+import homework.soft.activity.util.UploadUtils;
 import homework.soft.activity.util.beans.CommonResult;
 import homework.soft.activity.util.beans.ListResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import jakarta.annotation.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -64,6 +70,7 @@ public class UserController {
     @PutMapping("/update/{id}")
     @PermissionAuthorize
     public CommonResult<Boolean> updateUser(@PathVariable String id, @RequestBody User param) {
+        AssertUtils.isTrue(AuthUtils.getUserDetails().getUserId().equals(id) || AuthUtils.hasAnyRole(RoleType.SUPER_ADMIN), HttpStatus.FORBIDDEN, "无权更新");
         param.setUserId(id);
         return userService.updateById(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
@@ -81,6 +88,20 @@ public class UserController {
     public CommonResult<UserVO> getCurrentUser() {
         UserVO vo = AuthUtils.getUserDetails();
         return CommonResult.success(vo);
+    }
+
+    @Operation(summary = "用户上传头像")
+    @PostMapping("/upload-avatar")
+    public CommonResult<String> uploadAvatar(@RequestParam("file") MultipartFile file) throws IOException {
+        String filename = UploadUtils.upload(file, UploadModule.USER_AVATAR.toString());
+        return CommonResult.success(filename);
+    }
+
+    @Operation(summary = "用户查看头像")
+    @GetMapping("/upload-avatar/{filename}")
+    public ResponseEntity<org.springframework.core.io.Resource> viewAvatar(@PathVariable String filename) throws IOException {
+
+        return UploadUtils.getResponseEntity(UploadModule.USER_AVATAR.toString(), filename);
     }
 
     @Operation(summary = "用户账号密码登录")
