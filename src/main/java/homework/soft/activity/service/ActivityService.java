@@ -41,5 +41,11 @@ public interface ActivityService extends IService<Activity> {
      */
     int count(ActivityQuery param);
 
+
+    /**
+     * 拿到自增id
+     * @return
+     */
+    int getMaxActivityId();
 }
 

@@ -20,7 +20,7 @@ import java.util.List;
  * @author jscomet
  * @since 2024-11-24 14:58:50
  */
-@Tag(name = "Activity", description = "")
+@Tag(name = "Activity", description = "活动模块")
 @RestController
 @RequestMapping("/activity")
 public class ActivityController {
@@ -47,6 +47,10 @@ public class ActivityController {
     @Operation(summary = "添加")
     @PostMapping("/add")
     public CommonResult<Boolean> addActivity(@RequestBody Activity param) {
+        if (param.getActivityId() == null) {
+            Integer maxId = activityService.getMaxActivityId();
+            param.setActivityId((maxId != null ? maxId : 0) + 1);
+        }
         return activityService.save(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
 
