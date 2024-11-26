@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import homework.soft.activity.entity.po.Activity;
-import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.dto.ActivityQuery;
 import homework.soft.activity.entity.vo.ActivityVO;
 
@@ -37,10 +36,9 @@ public interface ActivityDao extends BaseMapper<Activity> {
     /**
      * 筛选条件计数
      *
-     * @param param 查询参数
      * @return 数量
      */
-    int count(ActivityQuery param);
+    int count();
     /**
     * 批量新增数据（MyBatis原生foreach方法）
     *
@@ -58,6 +56,11 @@ public interface ActivityDao extends BaseMapper<Activity> {
     */
     int insertOrUpdateBatch(@Param("entities") List<Activity> entities);
 
+
+    /**
+     * 获取自增id
+     * @return
+     */
 }
 
 

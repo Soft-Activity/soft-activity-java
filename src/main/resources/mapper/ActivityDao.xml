@@ -82,7 +82,7 @@
         from `activity`
         <include refid="queryCondition"/>
     </select>
- 
+
 
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="activityId" useGeneratedKeys="true">
