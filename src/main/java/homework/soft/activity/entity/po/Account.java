@@ -30,7 +30,7 @@ public class Account implements Serializable {
     /**
      * 密码
      */
-    @Schema(description = "密码")    
+    @Schema(description = "密码")
     @TableField(value = "password")
     private String password;
 
