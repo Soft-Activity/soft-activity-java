@@ -41,5 +41,6 @@ public interface CommentService extends IService<Comment> {
      */
     int count(CommentQuery param);
 
+    int getMaxCommentId();
 }
 

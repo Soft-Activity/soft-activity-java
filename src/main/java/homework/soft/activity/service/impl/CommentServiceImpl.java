@@ -1,7 +1,9 @@
 package homework.soft.activity.service.impl;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import homework.soft.activity.dao.CommentDao;
+import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.po.Comment;
 import homework.soft.activity.service.CommentService;
 import homework.soft.activity.entity.dto.CommentQuery;
@@ -36,6 +38,14 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, Comment> impleme
     @Override
     public int count(CommentQuery param) {
         return commentDao.count(param);
+    }
+
+    @Override
+    public int getMaxCommentId() {
+        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("MAX(comment_id) as comment_id");
+        Comment comment = commentDao.selectOne(queryWrapper);
+        return comment != null ? comment.getCommentId() : null;
     }
 }
 
