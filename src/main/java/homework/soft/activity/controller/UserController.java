@@ -27,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+import static cn.afterturn.easypoi.util.PoiFunctionUtil.length;
+
 /**
  * 用户(User)表控制层
  *
@@ -44,8 +46,12 @@ public class UserController {
     @GetMapping("/info/{id}")
     @PermissionAuthorize(RoleType.SUPER_ADMIN)
     public CommonResult<UserVO> getUser(@PathVariable String id) {
-        UserVO vo = userService.queryById(id);
-        return vo != null ? CommonResult.success(vo) : CommonResult.error(HttpStatus.NOT_FOUND);
+        try {
+            UserVO vo = userService.queryById(id);
+            return vo != null ? CommonResult.success(vo) : CommonResult.error(HttpStatus.NOT_FOUND);
+        }catch (Exception e){
+            return CommonResult.error(HttpStatus.BAD_REQUEST, "账号错误");
+        }
     }
 
     @Operation(summary = "获取用户列表")
