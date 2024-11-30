@@ -47,6 +47,10 @@ public class ActivityCategoryController {
     @Operation(summary = "添加活动分类表")
     @PostMapping("/add")
     public CommonResult<Boolean> addActivityCategory(@RequestBody ActivityCategory param) {
+        if (param.getCategoryId() == null) {
+            int maxId = activityCategoryService.getMaxActivityCategoryId();
+            param.setCategoryId(maxId + 1);
+        }
         return activityCategoryService.save(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
 
