@@ -45,7 +45,7 @@ public class ActivityCategoryServiceImpl extends ServiceImpl<ActivityCategoryDao
         QueryWrapper<ActivityCategory> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("MAX(category_id) as category_id");
         ActivityCategory activityCategory = activityCategoryDao.selectOne(queryWrapper);
-        return activityCategory != null ? activityCategory.getCategoryId() : 0;
+        return activityCategory != null ? activityCategory.getCategoryId() : null;
     }
 }
 
