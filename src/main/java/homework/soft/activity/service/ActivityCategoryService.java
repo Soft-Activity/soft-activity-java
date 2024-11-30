@@ -41,5 +41,6 @@ public interface ActivityCategoryService extends IService<ActivityCategory> {
      */
     int count(ActivityCategoryQuery param);
 
+    int getMaxActivityCategoryId();
 }
 

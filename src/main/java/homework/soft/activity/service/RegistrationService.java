@@ -41,5 +41,6 @@ public interface RegistrationService extends IService<Registration> {
      */
     int count(RegistrationQuery param);
 
+    int getMaxRegistrationId();
 }
 

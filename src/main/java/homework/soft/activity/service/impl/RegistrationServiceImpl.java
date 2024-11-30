@@ -1,7 +1,9 @@
 package homework.soft.activity.service.impl;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import homework.soft.activity.dao.RegistrationDao;
+import homework.soft.activity.entity.po.Comment;
 import homework.soft.activity.entity.po.Registration;
 import homework.soft.activity.service.RegistrationService;
 import homework.soft.activity.entity.dto.RegistrationQuery;
@@ -36,6 +38,14 @@ public class RegistrationServiceImpl extends ServiceImpl<RegistrationDao, Regist
     @Override
     public int count(RegistrationQuery param) {
         return registrationDao.count(param);
+    }
+
+    @Override
+    public int getMaxRegistrationId() {
+        QueryWrapper<Registration> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("MAX(registration_id) as registration_id");
+        Registration registration = registrationDao.selectOne(queryWrapper);
+        return registration != null ? registration.getRegistrationId() : 0;
     }
 }
 

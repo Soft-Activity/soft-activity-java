@@ -47,6 +47,10 @@ public class RegistrationController {
     @Operation(summary = "添加报名表")
     @PostMapping("/add")
     public CommonResult<Boolean> addRegistration(@RequestBody Registration param) {
+        if (param.getRegistrationId() == null) {
+            int maxId = registrationService.getMaxRegistrationId();
+            param.setRegistrationId(maxId + 1);
+        }
         return registrationService.save(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
 
