@@ -47,7 +47,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityDao, Activity> impl
         QueryWrapper<Activity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("MAX(activity_id) as activity_id");
         Activity activity = activityDao.selectOne(queryWrapper);
-        return activity != null ? activity.getActivityId() : null;
+        return activity != null ? activity.getActivityId() : 0;
     }
 }
 
