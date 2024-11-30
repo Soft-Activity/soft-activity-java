@@ -45,7 +45,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, Comment> impleme
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("MAX(comment_id) as comment_id");
         Comment comment = commentDao.selectOne(queryWrapper);
-        return comment != null ? comment.getCommentId() : null;
+        return comment != null ? comment.getCommentId() : 0;
     }
 }
 
