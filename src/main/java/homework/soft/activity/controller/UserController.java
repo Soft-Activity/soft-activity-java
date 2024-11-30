@@ -68,24 +68,23 @@ public class UserController {
     @Operation(summary = "添加用户")
     @PostMapping("/add")
     @PermissionAuthorize(RoleType.SUPER_ADMIN)
-    public CommonResult<Boolean> addUser(@RequestBody User param) {
-        return userService.save(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
+    public CommonResult<Boolean> addUser(@RequestBody UserCreateParm param) {
+        return userService.saveNewUser(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST,"用户注册失败,请联系管理员");
     }
 
     @Operation(summary = "修改指定用户信息")
     @PutMapping("/update/{id}")
     @PermissionAuthorize
-    public CommonResult<Boolean> updateUser(@PathVariable String id, @RequestBody User param) {
+    public CommonResult<Boolean> updateUser(@PathVariable String id, @RequestBody UserCreateParm param) {
         AssertUtils.isTrue(AuthUtils.getUserDetails().getUserId().equals(id) || AuthUtils.hasAnyRole(RoleType.SUPER_ADMIN), HttpStatus.FORBIDDEN, "无权更新");
-        param.setUserId(id);
-        return userService.updateById(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
+        return userService.updateUser(id,param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST,"用户信息更新失败,请联系管理员");
     }
 
     @Operation(summary = "删除指定用户")
     @DeleteMapping("/delete/{id}")
     @PermissionAuthorize(RoleType.SUPER_ADMIN)
     public CommonResult<Boolean> deleteUser(@PathVariable String id) {
-        return userService.removeById(id) ? CommonResult.success(true) : CommonResult.error(HttpStatus.NOT_FOUND);
+        return userService.deleteUser(id) ? CommonResult.success(true) : CommonResult.error(HttpStatus.NOT_FOUND);
     }
 
     //用户个人功能软件

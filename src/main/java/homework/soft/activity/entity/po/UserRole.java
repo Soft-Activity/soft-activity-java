@@ -1,10 +1,12 @@
 package homework.soft.activity.entity.po;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,6 +18,8 @@ import java.io.Serializable;
  * @since 2024-11-24 09:26:02
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserRole implements Serializable {
     @Serial
     private static final long serialVersionUID = -30696759645873659L;
@@ -32,6 +36,5 @@ public class UserRole implements Serializable {
     @Schema(description = "角色id")
     @TableField(value = "role_id")
     private Integer roleId;
-
 
 }

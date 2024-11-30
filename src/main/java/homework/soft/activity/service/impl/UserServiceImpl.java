@@ -1,23 +1,18 @@
 package homework.soft.activity.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import homework.soft.activity.dao.UserDao;
-import homework.soft.activity.entity.po.Account;
-import homework.soft.activity.entity.po.Role;
-import homework.soft.activity.entity.po.Student;
-import homework.soft.activity.entity.po.User;
+import homework.soft.activity.entity.dto.UserCreateParm;
+import homework.soft.activity.entity.po.*;
 import homework.soft.activity.entity.vo.UserAuthVO;
-import homework.soft.activity.service.AccountService;
-import homework.soft.activity.service.RoleService;
-import homework.soft.activity.service.StudentService;
-import homework.soft.activity.service.UserService;
+import homework.soft.activity.service.*;
 import homework.soft.activity.entity.dto.UserQuery;
 import homework.soft.activity.entity.vo.UserVO;
 import homework.soft.activity.util.AssertUtils;
-import homework.soft.activity.util.AuthUtils;
 import homework.soft.activity.util.JwtUtils;
 import homework.soft.activity.util.WeChatUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +40,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private AccountService accountService;
     @Resource
     private StudentService studentService;
+    @Resource
+    private UserRoleService userRoleService;
 
     @Override
     public UserVO queryById(String userId) {
@@ -183,6 +180,47 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return new UserAuthVO(token);
     }
 
+    @Override
+    @Transactional
+    public Boolean saveNewUser(UserCreateParm param) {
+        try {
+//            保存用户信息
+            this.save(param);
+//            保存用户角色信息
+            for(int roleId : param.getRoleIds()){
+                userRoleService.save(new UserRole(param.getUserId(),roleId));
+            }
+            Account account = new Account(param.getUserId(),"123456","");
+            accountService.save(account);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
 
+    @Override
+    @Transactional
+    public boolean updateUser(String id, UserCreateParm param) {
+        if (!deleteUser(id))
+            return false;
+//        更新用户信息
+        saveNewUser(param);
+        return true;
+    }
+
+    @Override
+    public boolean deleteUser(String id) {
+        try {
+//            删除用户信息
+            removeById(id);
+//            删除用户角色信息
+            userRoleService.remove(new QueryWrapper<UserRole>().eq("user_id", id));
+//            删除用户账号信息
+            accountService.remove(new QueryWrapper<Account>().eq("user_id", id));
+        }catch (Exception e){
+            return false;
+        }
+        return true;
+    }
 }
 
