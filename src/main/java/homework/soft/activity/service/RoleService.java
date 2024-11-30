@@ -47,5 +47,7 @@ public interface RoleService extends IService<Role> {
      * @return 角色列表
      */
     List<Role> queryByUserId(String userId);
+
+    int getMaxRoleId();
 }
 

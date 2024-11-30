@@ -48,8 +48,8 @@ public class ActivityController {
     @PostMapping("/add")
     public CommonResult<Boolean> addActivity(@RequestBody Activity param) {
         if (param.getActivityId() == null) {
-            Integer maxId = activityService.getMaxActivityId();
-            param.setActivityId((maxId != null ? maxId : 0) + 1);
+            int maxId = activityService.getMaxActivityId();
+            param.setActivityId(maxId + 1);
         }
         return activityService.save(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }

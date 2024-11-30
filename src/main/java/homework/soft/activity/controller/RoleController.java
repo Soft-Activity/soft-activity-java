@@ -47,6 +47,10 @@ public class RoleController {
     @Operation(summary = "添加角色")
     @PostMapping("/add")
     public CommonResult<Boolean> addRole(@RequestBody Role param) {
+        if (param.getRoleId() == null) {
+            int maxId = roleService.getMaxRoleId();
+            param.setRoleId(maxId + 1);
+        }
         return roleService.save(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
 
