@@ -67,11 +67,12 @@ public class JwtLoginInterceptor implements HandlerInterceptor {
         }
         // 检查请求头中是否包含 x-skip-login
         String skipLogin = request.getHeader("x-skip-login");
-        if ("true".equalsIgnoreCase(skipLogin)) {
+        if ("1".equalsIgnoreCase(skipLogin)) {
             UserVO admin = new UserVO();
-            role.setCname("admin");
-            role.setEname("admin");
+            role.setCname("SUPER_ADMIN");
+            role.setEname("SUPER_ADMIN");
             admin.setRoles(List.of(role));
+            admin.setUserId("1");
             AuthUtils.setUserDetails(admin);
             return true;
         }
