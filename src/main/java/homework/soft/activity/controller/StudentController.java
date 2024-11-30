@@ -47,6 +47,9 @@ public class StudentController {
     @Operation(summary = "添加学生")
     @PostMapping("/add")
     public CommonResult<Boolean> addStudent(@RequestBody Student param) {
+        if (checkStudentId(param.getStudentId())) {
+            return CommonResult.error(HttpStatus.BAD_REQUEST, "学号格式错误");
+        }
         return studentService.save(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
 
@@ -61,6 +64,15 @@ public class StudentController {
     @Operation(summary = "删除指定学生")
     @DeleteMapping("/delete/{id}")
     public CommonResult<Boolean> deleteStudent(@PathVariable String id) {
+        if (checkStudentId(id)) {
+            return CommonResult.error(HttpStatus.BAD_REQUEST, "学号格式错误");
+        }
         return studentService.removeById(id) ? CommonResult.success(true) : CommonResult.error(HttpStatus.NOT_FOUND);
+    }
+
+//    抽象学号校验
+    private boolean checkStudentId(String studentId) {
+        String regex = "202\\d{8}";
+        return studentId.matches(regex);
     }
 }

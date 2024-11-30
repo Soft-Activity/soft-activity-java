@@ -1,5 +1,6 @@
 package homework.soft.activity.entity.po;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -26,6 +27,7 @@ public class Student implements Serializable {
      */
     @Schema(description = "学生学号")    
     @TableId(value = "student_id")
+//    @JsonProperty("student_id")
     private String studentId;
 
 
@@ -76,6 +78,7 @@ public class Student implements Serializable {
      */
     @Schema(description = "是否已认证0为认证，1已认证")    
     @TableField(value = "is_verified")
+//    @JsonProperty("is_verified")
     private Boolean isVerified;
 
 
