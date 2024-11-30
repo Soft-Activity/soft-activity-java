@@ -1,7 +1,9 @@
 package homework.soft.activity.service.impl;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import homework.soft.activity.dao.RoleDao;
+import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.po.Role;
 import homework.soft.activity.service.RoleService;
 import homework.soft.activity.entity.dto.RoleQuery;
@@ -40,6 +42,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
     @Override
     public List<Role> queryByUserId(String userId) {
         return roleDao.queryByUserId(userId);
+    }
+
+    @Override
+    public int getMaxRoleId() {
+        QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("MAX(role_id) as role_id");
+        Role role = roleDao.selectOne(queryWrapper);
+        return role != null ? role.getRoleId() : 3;
     }
 
 
