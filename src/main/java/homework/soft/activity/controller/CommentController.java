@@ -48,8 +48,8 @@ public class CommentController {
     @PostMapping("/add")
     public CommonResult<Boolean> addComment(@RequestBody Comment param) {
         if (param.getCommentId() == null) {
-            Integer maxId = commentService.getMaxCommentId();
-            param.setCommentId((maxId != null ? maxId : 0) + 1);
+            int maxId = commentService.getMaxCommentId();
+            param.setCommentId(maxId + 1);
         }
         return commentService.save(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }

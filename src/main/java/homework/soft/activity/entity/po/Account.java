@@ -1,7 +1,7 @@
 package homework.soft.activity.entity.po;
 
-import cn.afterturn.easypoi.excel.annotation.Excel;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -16,6 +16,7 @@ import java.io.Serializable;
  * @since 2024-11-24 09:35:29
  */
 @Data
+@AllArgsConstructor
 public class Account implements Serializable {
     @Serial
     private static final long serialVersionUID = 753913473819655429L;
