@@ -1,5 +1,7 @@
 package homework.soft.activity.controller;
 
+import homework.soft.activity.annotation.PermissionAuthorize;
+import homework.soft.activity.constant.enums.RoleType;
 import homework.soft.activity.entity.dto.ActivityQuery;
 import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.vo.ActivityVO;
@@ -46,6 +48,7 @@ public class ActivityController {
 
     @Operation(summary = "添加")
     @PostMapping("/add")
+    @PermissionAuthorize(RoleType.SUPER_ADMIN)
     public CommonResult<Boolean> addActivity(@RequestBody Activity param) {
         if (param.getActivityId() == null) {
             int maxId = activityService.getMaxActivityId();

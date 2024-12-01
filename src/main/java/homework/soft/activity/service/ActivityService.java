@@ -47,5 +47,6 @@ public interface ActivityService extends IService<Activity> {
      * @return
      */
     int getMaxActivityId();
+
 }
 

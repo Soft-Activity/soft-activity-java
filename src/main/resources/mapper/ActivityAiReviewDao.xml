@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homework.soft.activity.dao.ActivityAiReviewDao">
+
+    <resultMap id="ActivityAiReviewMap" type="homework.soft.activity.entity.po.ActivityAiReview">
+        <result property="activityId" column="activity_id" jdbcType="INTEGER"/>
+        <result property="aiAnalysis" column="ai_analysis" jdbcType="VARCHAR"/>
+        <result property="goodNum" column="good_num" jdbcType="INTEGER"/>
+        <result property="mediumNum" column="medium_num" jdbcType="INTEGER"/>
+        <result property="poorNum" column="poor_num" jdbcType="INTEGER"/>
+        <result property="averageScore" column="average_score" jdbcType="INTEGER"/>
+    </resultMap>
+    
+    <resultMap id="ActivityAiReviewVOMap" type="homework.soft.activity.entity.vo.ActivityAiReviewVO" extends="ActivityAiReviewMap" autoMapping="true"/>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ActivityAiReviewVOMap">
+        select *
+        from `activity_ai_review`
+        where `activity_id` = #{activityId}
+    </select>
+
+     <!--筛选条件-->
+   <sql id="queryCondition">
+        <where>
+            <if test="activityId != null">
+                and `activity_id` = #{activityId}
+            </if>
+            <if test="aiAnalysis != null and aiAnalysis != ''">
+                and `ai_analysis` = #{aiAnalysis}
+            </if>
+            <if test="goodNum != null">
+                and `good_num` = #{goodNum}
+            </if>
+            <if test="mediumNum != null">
+                and `medium_num` = #{mediumNum}
+            </if>
+            <if test="poorNum != null">
+                and `poor_num` = #{poorNum}
+            </if>
+            <if test="averageScore != null">
+                and `average_score` = #{averageScore}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="ActivityAiReviewVOMap">
+        select *
+        from `activity_ai_review`
+        <include refid="queryCondition"/>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(1)
+        from `activity_ai_review`
+        <include refid="queryCondition"/>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="activityId" useGeneratedKeys="true">
+        insert into `activity_ai_review`(`ai_analysis`,`good_num`,`medium_num`,`poor_num`,`average_score`)
+        values (#{aiAnalysis},#{goodNum},#{mediumNum},#{poorNum},#{averageScore})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="activityId" useGeneratedKeys="true">
+        insert into `activity_ai_review`(`ai_analysis`,`good_num`,`medium_num`,`poor_num`,`average_score`)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.aiAnalysis},#{entity.goodNum},#{entity.mediumNum},#{entity.poorNum},#{entity.averageScore})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="activityId" useGeneratedKeys="true">
+        insert into `activity_ai_review`(`ai_analysis`,`good_num`,`medium_num`,`poor_num`,`average_score`)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.aiAnalysis},#{entity.goodNum},#{entity.mediumNum},#{entity.poorNum},#{entity.averageScore})
+        </foreach>
+        on duplicate key update
+`ai_analysis` = values(ai_analysis),
+`good_num` = values(good_num),
+`medium_num` = values(medium_num),
+`poor_num` = values(poor_num),
+`average_score` = values(average_score)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update `activity_ai_review`
+        <set>
+            <if test="aiAnalysis != null and aiAnalysis != ''">
+                `ai_analysis` = #{aiAnalysis},
+            </if>
+            <if test="goodNum != null">
+                `good_num` = #{goodNum},
+            </if>
+            <if test="mediumNum != null">
+                `medium_num` = #{mediumNum},
+            </if>
+            <if test="poorNum != null">
+                `poor_num` = #{poorNum},
+            </if>
+            <if test="averageScore != null">
+                `average_score` = #{averageScore},
+            </if>
+        </set>
+        where `activity_id` = #{activityId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from `activity_ai_review` where `activity_id` = #{activityId}
+    </delete>
+
+</mapper>

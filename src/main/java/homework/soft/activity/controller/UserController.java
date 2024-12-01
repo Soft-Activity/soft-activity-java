@@ -138,5 +138,4 @@ public class UserController {
         UserAuthVO auth = userService.bindWxByStudentInfo(param.getCode(), student);
         return CommonResult.success(auth);
     }
-
 }

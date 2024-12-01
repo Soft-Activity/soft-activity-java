@@ -36,6 +36,7 @@ public interface UserService extends IService<User> {
      */
     List<UserVO> queryAll(int current, int pageSize, UserQuery param);
 
+    Boolean saveNewUser(UserCreateParm param);
     /**
      * 通过实体作为筛选条件计数
      *
@@ -52,7 +53,7 @@ public interface UserService extends IService<User> {
 
     UserAuthVO bindWxByStudentInfo(String code, Student student);
 
-    Boolean saveNewUser(UserCreateParm param);
+
 
     boolean updateUser(String id, UserCreateParm param);
 
