@@ -9,6 +9,7 @@ import homework.soft.activity.entity.po.Student;
 import homework.soft.activity.entity.po.User;
 import homework.soft.activity.entity.vo.UserAuthVO;
 import homework.soft.activity.entity.vo.UserVO;
+import homework.soft.activity.property.AppProperty;
 import homework.soft.activity.service.UserService;
 import homework.soft.activity.util.AssertUtils;
 import homework.soft.activity.util.AuthUtils;
@@ -41,6 +42,8 @@ import static cn.afterturn.easypoi.util.PoiFunctionUtil.length;
 public class UserController {
     @Resource
     private UserService userService;
+    @Resource
+    private AppProperty appProperty;
 
     @Operation(summary = "获取指定用户信息")
     @GetMapping("/info/{id}")
@@ -49,7 +52,7 @@ public class UserController {
         try {
             UserVO vo = userService.queryById(id);
             return vo != null ? CommonResult.success(vo) : CommonResult.error(HttpStatus.NOT_FOUND);
-        }catch (Exception e){
+        } catch (Exception e) {
             return CommonResult.error(HttpStatus.BAD_REQUEST, "账号错误");
         }
     }
@@ -69,7 +72,7 @@ public class UserController {
     @PostMapping("/add")
     @PermissionAuthorize(RoleType.SUPER_ADMIN)
     public CommonResult<Boolean> addUser(@RequestBody UserCreateParm param) {
-        return userService.saveNewUser(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST,"用户注册失败,请联系管理员");
+        return userService.saveNewUser(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "用户注册失败,请联系管理员");
     }
 
     @Operation(summary = "修改指定用户信息")
@@ -77,7 +80,7 @@ public class UserController {
     @PermissionAuthorize
     public CommonResult<Boolean> updateUser(@PathVariable String id, @RequestBody UserCreateParm param) {
         AssertUtils.isTrue(AuthUtils.getUserDetails().getUserId().equals(id) || AuthUtils.hasAnyRole(RoleType.SUPER_ADMIN), HttpStatus.FORBIDDEN, "无权更新");
-        return userService.updateUser(id,param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST,"用户信息更新失败,请联系管理员");
+        return userService.updateUser(id, param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "用户信息更新失败,请联系管理员");
     }
 
     @Operation(summary = "删除指定用户")
@@ -98,12 +101,12 @@ public class UserController {
     @Operation(summary = "用户上传头像")
     @PostMapping("/upload-avatar")
     public CommonResult<String> uploadAvatar(@RequestParam("file") MultipartFile file) throws IOException {
-        String filename = UploadUtils.upload(file, UploadModule.USER_AVATAR.toString());
+        String filename = appProperty.getBack().getUrl() + "/view-avatar" + UploadUtils.upload(file, UploadModule.USER_AVATAR.toString());
         return CommonResult.success(filename);
     }
 
     @Operation(summary = "用户查看头像")
-    @GetMapping("/upload-avatar/{filename}")
+    @GetMapping("/view-avatar/{filename}")
     public ResponseEntity<org.springframework.core.io.Resource> viewAvatar(@PathVariable String filename) throws IOException {
 
         return UploadUtils.getResponseEntity(UploadModule.USER_AVATAR.toString(), filename);
