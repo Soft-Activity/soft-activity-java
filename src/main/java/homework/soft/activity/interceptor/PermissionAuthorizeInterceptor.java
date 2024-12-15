@@ -3,6 +3,7 @@ package homework.soft.activity.interceptor;
 import homework.soft.activity.annotation.PermissionAuthorize;
 import homework.soft.activity.constant.enums.RoleType;
 import homework.soft.activity.exception.HttpErrorException;
+import homework.soft.activity.property.AppProperty;
 import homework.soft.activity.service.RoleService;
 import homework.soft.activity.util.AuthUtils;
 import jakarta.annotation.Nonnull;
@@ -18,6 +19,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class PermissionAuthorizeInterceptor implements HandlerInterceptor {
     @Resource
     private RoleService roleService;
+    @Resource
+    private AppProperty appProperty;
 
     @Override
     public boolean preHandle(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull Object handler) throws Exception {
@@ -25,6 +28,10 @@ public class PermissionAuthorizeInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod method)) {
             return true;
         }
+        if (!Boolean.TRUE.equals(appProperty.getSecurity().isEnabled())) {
+            return true;
+        }
+
         PermissionAuthorize permissionAuthorize = method.getMethod().getAnnotation(PermissionAuthorize.class);
         if (permissionAuthorize == null) {
             return true;

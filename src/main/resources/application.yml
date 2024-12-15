@@ -32,6 +32,11 @@ springdoc:
   api-docs:
     enabled: true
     path: /v3/api-docs
+  swagger-ui:
+      path: /swagger-ui.html
+      enabled: true
+
+
 
 # MyBatis 配置
 mybatis:
@@ -71,3 +76,5 @@ app:
   applet:
     appid: wx11ec877a7434f2b5
     secret: 316a5131cbe44994076cb45c6f5895b9
+  security:
+    enabled: false
