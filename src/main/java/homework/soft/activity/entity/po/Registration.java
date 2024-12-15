@@ -1,5 +1,6 @@
 package homework.soft.activity.entity.po;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -23,7 +24,7 @@ public class Registration implements Serializable {
      * 报名id
      */
     @Schema(description = "报名id")    
-    @TableId(value = "registration_id")
+    @TableId(value = "registration_id",type = IdType.AUTO)
     private Integer registrationId;
 
 

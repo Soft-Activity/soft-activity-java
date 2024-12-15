@@ -1,5 +1,6 @@
 package homework.soft.activity.entity.po;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -23,7 +24,7 @@ public class Activity implements Serializable {
      * 活动id
      */
     @Schema(description = "活动id")    
-    @TableId(value = "activity_id")
+    @TableId(value = "activity_id",type = IdType.AUTO)
     private Integer activityId;
 
 

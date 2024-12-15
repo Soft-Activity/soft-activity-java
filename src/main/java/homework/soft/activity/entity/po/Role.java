@@ -1,5 +1,6 @@
 package homework.soft.activity.entity.po;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -22,7 +23,7 @@ public class Role implements Serializable {
      * 用户id
      */
     @Schema(description = "用户id")    
-    @TableId(value = "role_id")
+    @TableId(value = "role_id",type = IdType.AUTO)
     private Integer roleId;
 
 

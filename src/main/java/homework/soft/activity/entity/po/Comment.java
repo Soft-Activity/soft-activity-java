@@ -1,5 +1,6 @@
 package homework.soft.activity.entity.po;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -23,7 +24,7 @@ public class Comment implements Serializable {
      * 评论id
      */
     @Schema(description = "评论id")    
-    @TableId(value = "comment_id")
+    @TableId(value = "comment_id",type = IdType.AUTO)
     private Integer commentId;
 
 
