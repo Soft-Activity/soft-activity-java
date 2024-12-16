@@ -6,7 +6,7 @@ package homework.soft.activity.constant.enums;
  */
 public enum UploadModule {
     COMMENT,
-    USER_AVATAR;
+    USER_AVATAR, IMAGE, FILE;
 
     @Override
     public String toString() {
