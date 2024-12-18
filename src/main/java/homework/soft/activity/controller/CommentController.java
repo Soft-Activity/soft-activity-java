@@ -1,9 +1,11 @@
 package homework.soft.activity.controller;
 
+import homework.soft.activity.annotation.PermissionAuthorize;
 import homework.soft.activity.entity.dto.CommentQuery;
 import homework.soft.activity.entity.po.Comment;
 import homework.soft.activity.entity.vo.CommentVO;
 import homework.soft.activity.service.CommentService;
+import homework.soft.activity.util.AuthUtils;
 import homework.soft.activity.util.beans.CommonResult;
 import homework.soft.activity.util.beans.ListResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,9 +46,18 @@ public class CommentController {
         return CommonResult.success(new ListResult<>(list, total));
     }
 
-    @Operation(summary = "添加")
+    @Operation(summary = "获取我是否评论过活动")
+    @GetMapping("/is-comment/{activityId}")
+    @PermissionAuthorize
+    public CommonResult<Boolean> isComment(@PathVariable Integer activityId) {
+        return CommonResult.success(commentService.isComment(AuthUtils.getCurrentUserId(), activityId));
+    }
+
+    @Operation(summary = "添加评论")
     @PostMapping("/add")
+    @PermissionAuthorize
     public CommonResult<Boolean> addComment(@RequestBody Comment param) {
+        param.setStudentId(AuthUtils.getCurrentUserId());
         if (param.getCommentId() == null) {
             int maxId = commentService.getMaxCommentId();
             param.setCommentId(maxId + 1);

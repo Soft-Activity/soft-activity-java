@@ -1,6 +1,7 @@
 package homework.soft.activity.entity.vo;
 
 import homework.soft.activity.entity.po.Comment;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,4 +14,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class CommentVO extends Comment {
+    @Schema(description = "活动名称")
+    private String activityName;
+
+    @Schema(description = "评论者")
+    private UserVO student;
 }

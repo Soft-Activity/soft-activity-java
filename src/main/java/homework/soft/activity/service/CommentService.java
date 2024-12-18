@@ -26,9 +26,9 @@ public interface CommentService extends IService<Comment> {
     /**
      * 查询多条数据
      *
-     * @param current 查询页面
+     * @param current  查询页面
      * @param pageSize 查询条数
-     * @param param 查询参数
+     * @param param    查询参数
      * @return 对象列表
      */
     List<CommentVO> queryAll(int current, int pageSize, CommentQuery param);
@@ -42,5 +42,14 @@ public interface CommentService extends IService<Comment> {
     int count(CommentQuery param);
 
     int getMaxCommentId();
+
+    /**
+     * 判断是否评论过
+     *
+     * @param userId     用户id
+     * @param activityId 活动id
+     * @return 是否成功
+     */
+    Boolean isComment(String userId, Integer activityId);
 }
 
