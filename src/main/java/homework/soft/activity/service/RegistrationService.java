@@ -42,5 +42,26 @@ public interface RegistrationService extends IService<Registration> {
     int count(RegistrationQuery param);
 
     int getMaxRegistrationId();
+    /**
+     * 报名活动
+     * @param userId 用户id
+     * @param activityId 活动id
+     * @return 是否成功
+     */
+    boolean registerActivity(String userId, Integer activityId);
+    /**
+     * 判断是否报名过
+     * @param userId 用户id
+     * @param activityId 活动id
+     * @return 是否报名过
+     */
+    Boolean isRegister(String userId, Integer activityId);
+    /**
+     * 取消报名
+     * @param userId 用户id
+     * @param activityId 活动id
+     * @return 是否成功
+     */
+    boolean cancelRegister(String userId, Integer activityId);
 }
 

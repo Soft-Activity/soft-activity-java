@@ -43,9 +43,9 @@ public class Registration implements Serializable {
     private Integer activityId;
 
     /**
-     * 报名状态 0 未开始、1 进行中、2 已结束、3 已取消
+     * 报名状态 0 已报名 1 已取消
      */
-    @Schema(description = "报名状态 0 未开始、1 进行中、2 已结束、3 已取消")
+    @Schema(description = "报名状态 0 已报名 1 已取消")
     @TableField(value = "status")
     private Integer status;
 

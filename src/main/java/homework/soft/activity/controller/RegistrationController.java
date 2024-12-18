@@ -1,9 +1,12 @@
 package homework.soft.activity.controller;
 
+import homework.soft.activity.annotation.PermissionAuthorize;
 import homework.soft.activity.entity.dto.RegistrationQuery;
 import homework.soft.activity.entity.po.Registration;
 import homework.soft.activity.entity.vo.RegistrationVO;
 import homework.soft.activity.service.RegistrationService;
+import homework.soft.activity.util.AssertUtils;
+import homework.soft.activity.util.AuthUtils;
 import homework.soft.activity.util.beans.CommonResult;
 import homework.soft.activity.util.beans.ListResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,8 +40,8 @@ public class RegistrationController {
     @Operation(summary = "获取报名表列表")
     @GetMapping("/list")
     public CommonResult<ListResult<RegistrationVO>> getRegistrations(@RequestParam(defaultValue = "1") Integer current,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            RegistrationQuery param) {
+                                                                     @RequestParam(defaultValue = "10") Integer pageSize,
+                                                                     RegistrationQuery param) {
         List<RegistrationVO> list = registrationService.queryAll(current, pageSize, param);
         int total = registrationService.count(param);
         return CommonResult.success(new ListResult<>(list, total));
@@ -57,9 +60,32 @@ public class RegistrationController {
     @Operation(summary = "修改指定报名表信息")
     @PutMapping("/update/{id}")
     public CommonResult<Boolean> updateRegistration(@PathVariable Integer id,
-            @RequestBody Registration param) {
-            param.setRegistrationId(id);
+                                                    @RequestBody Registration param) {
+        param.setRegistrationId(id);
         return registrationService.updateById(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
+    }
+
+    @Operation(summary = "报名活动")
+    @PostMapping("/register/{activityId}")
+    @PermissionAuthorize
+    public CommonResult<Boolean> registerActivity(@PathVariable Integer activityId) {
+        AssertUtils.isTrue(AuthUtils.isAuthenticated(), HttpStatus.UNAUTHORIZED, "请先登录");
+        String userId = AuthUtils.getCurrentUserId();
+        return registrationService.registerActivity(userId, activityId) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
+    }
+
+    @Operation(summary = "获取我是否报名过活动")
+    @GetMapping("/is-apply/{activityId}")
+    public CommonResult<Boolean> isRegister(@PathVariable Integer activityId) {
+        String userId = AuthUtils.getCurrentUserId();
+        return CommonResult.success(registrationService.isRegister(userId, activityId));
+    }
+
+    @Operation(summary = "取消报名")
+    @DeleteMapping("/cancel/{activityId}")
+    public CommonResult<Boolean> cancelRegister(@PathVariable Integer activityId) {
+        String userId = AuthUtils.getCurrentUserId();
+        return registrationService.cancelRegister(userId, activityId) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
 
     @Operation(summary = "删除指定报名表")
