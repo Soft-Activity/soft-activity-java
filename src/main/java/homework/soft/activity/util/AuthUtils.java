@@ -13,6 +13,10 @@ public class AuthUtils {
         return CurrentUserContext.getCurrentUser();
     }
 
+    public static String getCurrentUserId() {
+        return getUserDetails().getUserId();
+    }
+
     public static void setUserDetails(UserVO user) {
         CurrentUserContext.setCurrentUser(user);
     }
