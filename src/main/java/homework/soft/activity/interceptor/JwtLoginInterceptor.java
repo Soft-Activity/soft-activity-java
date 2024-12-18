@@ -3,15 +3,20 @@ package homework.soft.activity.interceptor;
 import homework.soft.activity.constant.JwtClaimsConstant;
 import homework.soft.activity.entity.po.Role;
 import homework.soft.activity.entity.vo.UserVO;
+import homework.soft.activity.exception.HttpErrorException;
 import homework.soft.activity.property.AppProperty;
 import homework.soft.activity.service.UserService;
+import homework.soft.activity.util.AssertUtils;
 import homework.soft.activity.util.AuthUtils;
 import homework.soft.activity.util.JwtUtils;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -50,18 +55,24 @@ public class JwtLoginInterceptor implements HandlerInterceptor {
         AuthUtils.setUserDetails(guest);
         //2、从请求头中获取令牌，并设置当前用户信息
         String token = request.getHeader(appProperty.getJwt().getTokenName());
-        if (token != null) {
+        if (StringUtils.isNotBlank(token)) {
             //2.1 校验令牌
             Claims payload = null;
             try {
                 payload = JwtUtils.parseJWT(appProperty.getJwt().getSecretKey(), token);
-            } catch (Exception ignored) {
-
+            } catch (ExpiredJwtException e) {
+                log.error("token已过期");
+                throw  new HttpErrorException(HttpStatus.UNAUTHORIZED,"token已过期");
+            } catch (Exception e) {
+                log.error("token校验失败");
+                throw new HttpErrorException(HttpStatus.UNAUTHORIZED,"token校验失败");
             }
             //2. 根据userId 设置当前用户
             if (payload != null && payload.get(JwtClaimsConstant.USER_ID) != null) {
                 String userId = (String) payload.get(JwtClaimsConstant.USER_ID);
                 UserVO user = userService.queryById(userId);
+                // 用户不存在
+                AssertUtils.notNull(user, HttpStatus.UNAUTHORIZED, "用户不存在");
                 AuthUtils.setUserDetails(user);
             }
         }
