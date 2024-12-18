@@ -8,6 +8,7 @@ import homework.soft.activity.util.beans.CommonResult;
 import homework.soft.activity.util.beans.ListResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
@@ -68,6 +69,16 @@ public class StudentController {
             return CommonResult.error(HttpStatus.BAD_REQUEST, "学号格式错误");
         }
         return studentService.removeById(id) ? CommonResult.success(true) : CommonResult.error(HttpStatus.NOT_FOUND);
+    }
+    @Operation(summary = "获取学生学院列表")
+    @GetMapping("/college-list")
+    public CommonResult<List<String>> getCollegeList() {
+        return CommonResult.success(studentService.getCollegeList());
+    }
+    @Operation(summary = "获取学生班级列表")
+    @GetMapping("/class-list/{college}")
+    public CommonResult<List<String>> getClassList(@PathVariable @NotBlank String college) {
+        return CommonResult.success(studentService.getClassList(college));
     }
 
 //    抽象学号校验

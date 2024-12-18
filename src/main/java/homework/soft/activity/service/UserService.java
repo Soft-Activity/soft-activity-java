@@ -8,6 +8,7 @@ import homework.soft.activity.entity.po.User;
 import homework.soft.activity.entity.dto.UserQuery;
 import homework.soft.activity.entity.vo.UserAuthVO;
 import homework.soft.activity.entity.vo.UserVO;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -45,18 +46,66 @@ public interface UserService extends IService<User> {
      */
     int count(UserQuery param);
 
+    /**
+     * 用户通过账号密码登录
+     *
+     * @param userId 用户ID
+     * @param password 用户密码
+     * @return 用户认证信息
+     */
     UserAuthVO loginByPassword( String userId, String password);
 
+    /**
+     * 用户通过微信登录
+     *
+     * @param code 微信登录码
+     * @return 用户认证信息
+     */
     UserAuthVO loginByWX(String code);
 
-    UserAuthVO bindWxByPassword(String code,String userId, String password);
+    /**
+     * 微信用户通过账号密码绑定账号
+     *
+     * @param code 微信登录码
+     * @param studentId 学号/学工号
+     * @param password 用户密码
+     * @return 用户认证信息
+     */
+    UserAuthVO bindWxByPassword(String code,String studentId, String password);
 
+    /**
+     * 微信用户通过学生信息绑定账号
+     *
+     * @param code 微信登录码
+     * @param student 学生信息
+     * @return 用户认证信息
+     */
     UserAuthVO bindWxByStudentInfo(String code, Student student);
 
 
 
+    /**
+     * 更新用户信息
+     *
+     * @param id 用户ID
+     * @param param 用户创建参数
+     * @return 是否更新成功
+     */
     boolean updateUser(String id, UserCreateParm param);
 
+    /**
+     * 删除用户
+     *
+     * @param id 用户ID
+     * @return 是否删除成功
+     */
     boolean deleteUser(String id);
+
+    /**
+     * 解绑微信
+     * @param userId 用户id
+     * @return 是否解绑成功
+     */
+    boolean unbindWX(String userId);
 }
 

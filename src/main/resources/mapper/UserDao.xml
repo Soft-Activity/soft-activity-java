@@ -6,6 +6,9 @@
     <resultMap id="UserMap" type="homework.soft.activity.entity.po.User">
         <result property="userId" column="user_id" jdbcType="VARCHAR"/>
         <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="openId" column="open_id" jdbcType="VARCHAR"/>
+        <result property="studentId" column="student_id" jdbcType="VARCHAR"/>
         <result property="college" column="college" jdbcType="VARCHAR"/>
         <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
         <result property="gender" column="gender" jdbcType="VARCHAR"/>
@@ -28,6 +31,15 @@
             </if>
             <if test="name != null and name != ''">
                 and `name` = #{name}
+            </if>
+            <if test="password != null and password != ''">
+                and `password` = #{password}
+            </if>
+            <if test="openId != null and openId != ''">
+                and `open_id` = #{openId}
+            </if>
+            <if test="studentId != null and studentId != ''">
+                and `student_id` = #{studentId}
             </if>
             <if test="college != null and college != ''">
                 and `college` = #{college}
@@ -58,21 +70,24 @@
 
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="userId" useGeneratedKeys="true">
-        insert into user(name,college,avatar,gender)
+        insert into user(name,password,open_id,student_id,college,avatar,gender)
         values
         <foreach collection="entities" item="entity" separator=",">
-        (#{entity.name},#{entity.college},#{entity.avatar},#{entity.gender})
+        (#{entity.name},#{entity.password},#{entity.openId},#{entity.studentId},#{entity.college},#{entity.avatar},#{entity.gender})
         </foreach>
     </insert>
     <!-- 批量插入或按主键更新 -->
     <insert id="insertOrUpdateBatch" keyProperty="userId" useGeneratedKeys="true">
-        insert into user(name,college,avatar,gender)
+        insert into user(name,password,open_id,student_id,college,avatar,gender)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.name},#{entity.college},#{entity.avatar},#{entity.gender})
+            (#{entity.name},#{entity.password},#{entity.openId},#{entity.studentId},#{entity.college},#{entity.avatar},#{entity.gender})
         </foreach>
         on duplicate key update
            name = values(name) ,
+           password = values(password) ,
+           open_id = values(open_id) ,
+           student_id = values(student_id) ,
            college = values(college) ,
            avatar = values(avatar) ,
            gender = values(gender)     

@@ -112,6 +112,15 @@ public class UserController {
         return UploadUtils.getResponseEntity(UploadModule.USER_AVATAR.toString(), filename);
     }
 
+    @Operation(summary = "微信解绑")
+    @PostMapping("/unbind-wx/{userId}")
+    @PermissionAuthorize({RoleType.TEACHER, RoleType.TEACHER})
+    public CommonResult<Boolean> unbindWXByUserId(@PathVariable String userId) {
+        return userService.unbindWX(userId) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "解绑失败");
+    }
+
+    //用户个人操作功能软件
+
     @Operation(summary = "用户账号密码登录")
     @PostMapping("/login-by-password")
     public CommonResult<UserAuthVO> loginByPassword(@RequestBody @Validated UserPasswordLoginDTO param) {
@@ -129,7 +138,7 @@ public class UserController {
     @Operation(summary = "微信用户通过账号密码绑定账号")
     @PostMapping("/bind-wx-by-password")
     public CommonResult<UserAuthVO> bindWxByPassword(@RequestBody @Validated UserWXPasswordBindDTO param) {
-        UserAuthVO auth = userService.bindWxByPassword(param.getCode(), param.getUserId(), param.getPassword());
+        UserAuthVO auth = userService.bindWxByPassword(param.getCode(), param.getStudentId(), param.getPassword());
         return CommonResult.success(auth);
     }
 
@@ -140,5 +149,13 @@ public class UserController {
         BeanUtil.copyProperties(param, student);
         UserAuthVO auth = userService.bindWxByStudentInfo(param.getCode(), student);
         return CommonResult.success(auth);
+    }
+
+    @Operation(summary = "微信自行解绑")
+    @PostMapping("/unbind-wx-self")
+    @PermissionAuthorize
+    public CommonResult<Boolean> unbindMyWX() {
+        String userId = AuthUtils.getUserDetails().getUserId();
+        return userService.unbindWX(userId) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "解绑失败");
     }
 }

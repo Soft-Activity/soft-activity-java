@@ -37,5 +37,16 @@ public class StudentServiceImpl extends ServiceImpl<StudentDao, Student> impleme
     public int count(StudentQuery param) {
         return studentDao.count(param);
     }
+
+    @Override
+    public List<String> getCollegeList() {
+        return studentDao.getCollegeList();
+    }
+
+    @Override
+    public List<String> getClassList(String college) {
+        return studentDao.getClassList(college);
+    }
+
 }
 

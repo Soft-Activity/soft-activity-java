@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
+import homework.soft.activity.constant.enums.RoleType;
 import homework.soft.activity.dao.UserDao;
 import homework.soft.activity.entity.dto.UserCreateParm;
 import homework.soft.activity.entity.po.*;
 import homework.soft.activity.entity.vo.UserAuthVO;
+import homework.soft.activity.exception.HttpErrorException;
 import homework.soft.activity.service.*;
 import homework.soft.activity.entity.dto.UserQuery;
 import homework.soft.activity.entity.vo.UserVO;
@@ -37,8 +39,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Resource
     private RoleService roleService;
     @Resource
-    private AccountService accountService;
-    @Resource
     private StudentService studentService;
     @Resource
     private UserRoleService userRoleService;
@@ -51,6 +51,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     private void fillVO(UserVO userVO) {
+        if (userVO == null) {
+            return;
+        }
         String userId = userVO.getUserId();
         if (userId != null) {
             List<Role> roles = roleService.queryByUserId(userId);
@@ -71,15 +74,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return userDao.count(param);
     }
 
-    private boolean verifyPassword(String userId, String password) {
-        LambdaQueryWrapper<Account> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Account::getUserId, userId)
-                .eq(Account::getPassword, password);
-        return accountService.count(queryWrapper) > 0;
+    private boolean verifyPassword(String studentId, String password) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getStudentId, studentId)
+                .eq(User::getPassword, password);
+        return this.count(queryWrapper) > 0;
     }
 
-    private boolean verifyStudent(String userId, Student param) {
-        Student student = studentService.queryById(userId);
+    private boolean verifyStudent(String studentId, Student param) {
+        Student student = studentService.getById(studentId);
         if (student == null) {
             return false;
         }
@@ -113,36 +116,37 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         String openId = getOpenIdByCode(code);
         AssertUtils.isTrue(StringUtils.isNotBlank(openId), HttpStatus.INTERNAL_SERVER_ERROR, "微信登录失败");
         //2. 查询用户
-        Account account = accountService.lambdaQuery().eq(Account::getOpenId, openId).one();
-        AssertUtils.notNull(account, HttpStatus.FORBIDDEN, "查无账号信息");
-
+        User user = this.lambdaQuery().eq(User::getOpenId, openId).one();
+        AssertUtils.notNull(user, HttpStatus.NOT_FOUND, "查无账号信息");
         //2.获得token
-        String token = JwtUtils.createJWTByUserId(account.getUserId());
+        String token = JwtUtils.createJWTByUserId(user.getUserId());
         return new UserAuthVO(token);
     }
 
     @Override
     @Transactional
-    public UserAuthVO bindWxByPassword(String code, String userId, String password) {
+    public UserAuthVO bindWxByPassword(String code, String studentId, String password) {
         // 1.校验账号信息
-        AssertUtils.isTrue(verifyPassword(userId, password), HttpStatus.NOT_FOUND, "校验失败");
+        AssertUtils.isTrue(verifyPassword(studentId, password), HttpStatus.NOT_FOUND, "校验失败");
 
         //2. 查询用户
-        Account account = accountService.lambdaQuery().eq(Account::getUserId, userId).one();
-        AssertUtils.notNull(account, HttpStatus.NOT_FOUND, "查无账号信息");
+        User user = this.lambdaQuery().eq(User::getStudentId, studentId).one();
+        AssertUtils.notNull(user, HttpStatus.NOT_FOUND, "查无账号信息");
 
-        //3.校验是否已绑定微信
-        AssertUtils.notNull(account.getOpenId(), HttpStatus.BAD_REQUEST, "用户已绑定微信账号");
-
-        //4.获取用户openId
+        //3.获取用户openId
         String openId = getOpenIdByCode(code);
         AssertUtils.isTrue(StringUtils.isNotBlank(openId), HttpStatus.INTERNAL_SERVER_ERROR, "微信登录失败");
+
+        //4.校验是否已绑定微信
+        AssertUtils.isTrue(StringUtils.isBlank(user.getOpenId()) || user.getOpenId().equals(openId),
+                HttpStatus.BAD_REQUEST, "用户已绑定微信账号");
+
         //5.更新账号信息
-        LambdaUpdateWrapper<Account> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.set(Account::getOpenId, openId).eq(Account::getUserId, userId);
-        AssertUtils.isTrue(accountService.update(updateWrapper), HttpStatus.INTERNAL_SERVER_ERROR, "绑定失败");
+        LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(User::getOpenId, openId).eq(User::getUserId, user.getUserId());
+        AssertUtils.isTrue(this.update(updateWrapper), HttpStatus.INTERNAL_SERVER_ERROR, "绑定失败");
         //6.返回信息
-        String token = JwtUtils.createJWTByUserId(account.getUserId());
+        String token = JwtUtils.createJWTByUserId(user.getUserId());
 
         return new UserAuthVO(token);
     }
@@ -151,31 +155,48 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Transactional
     public UserAuthVO bindWxByStudentInfo(String code, Student student) {
 
-        String userId = student.getStudentId();
+        String studentId = student.getStudentId();
         // 1.校验账号信息
-        AssertUtils.isTrue(verifyStudent(userId, student), HttpStatus.NOT_FOUND, "校验失败");
+        AssertUtils.isTrue(verifyStudent(studentId, student), HttpStatus.BAD_REQUEST, "校验失败");
 
         //2. 查询用户
-        Account account = accountService.lambdaQuery().eq(Account::getUserId, userId).one();
-        AssertUtils.notNull(account, HttpStatus.NOT_FOUND, "查无账号信息");
+        User user = this.lambdaQuery().eq(User::getStudentId, studentId).one();
 
-        //3.校验是否已绑定微信
-        AssertUtils.notNull(account.getOpenId(), HttpStatus.BAD_REQUEST, "用户已绑定微信账号");
-
-        //4.获取用户openId
+        if (user == null) {
+            // 2.1. 根据学生信息创建用户
+            user = new User();
+            user.setStudentId(studentId);
+            user.setName(student.getName());
+            user.setCollege(student.getCollege());
+            user.setGender(student.getGender());
+            this.save(user);
+        }
+        //3.获取用户openId
         String openId = getOpenIdByCode(code);
         AssertUtils.isTrue(StringUtils.isNotBlank(openId), HttpStatus.INTERNAL_SERVER_ERROR, "微信登录失败");
+
+
+        //4.校验是否已绑定微信,或者当前登录用户就是绑定的用户
+        AssertUtils.isTrue(StringUtils.isBlank(user.getOpenId()) || user.getOpenId().equals(openId), HttpStatus.BAD_REQUEST, "用户已绑定微信账号");
+
         //5.更新账号信息
-        LambdaUpdateWrapper<Account> updateAccount = new LambdaUpdateWrapper<>();
-        updateAccount.set(Account::getOpenId, openId).eq(Account::getUserId, userId);
-        AssertUtils.isTrue(accountService.update(updateAccount), HttpStatus.INTERNAL_SERVER_ERROR, "绑定失败");
+        LambdaUpdateWrapper<User> updateAccount = new LambdaUpdateWrapper<>();
+        updateAccount.set(User::getOpenId, openId).eq(User::getUserId, user.getUserId());
+        AssertUtils.isTrue(this.update(updateAccount), HttpStatus.INTERNAL_SERVER_ERROR, "绑定失败");
         //6.更新认证状态
         LambdaUpdateWrapper<Student> updateStudent = new LambdaUpdateWrapper<>();
-        updateStudent.set(Student::getIsVerified,true).eq(Student::getStudentId, userId);
-        AssertUtils.isTrue(studentService.update(updateStudent),HttpStatus.INTERNAL_SERVER_ERROR,"绑定失败");
+        updateStudent.set(Student::getIsVerified, true).eq(Student::getStudentId, studentId);
+        AssertUtils.isTrue(studentService.update(updateStudent), HttpStatus.INTERNAL_SERVER_ERROR, "绑定失败");
 
-        //7.返回信息
-        String token = JwtUtils.createJWTByUserId(account.getUserId());
+        //7. 添加用户学生角色
+        UserRole userRole = new UserRole(user.getUserId(), RoleType.STUDENT.getRoleId());
+        //如果没有就保存
+        if (userRoleService.getOne(new QueryWrapper<>(userRole)) == null) {
+            userRoleService.save(userRole);
+        }
+
+        //8.返回信息
+        String token = JwtUtils.createJWTByUserId(user.getUserId());
 
         return new UserAuthVO(token);
     }
@@ -184,15 +205,18 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Transactional
     public Boolean saveNewUser(UserCreateParm param) {
         try {
+            param.setPassword("123456");
 //            保存用户信息
             this.save(param);
 //            保存用户角色信息
-            for(int roleId : param.getRoleIds()){
-                userRoleService.save(new UserRole(param.getUserId(),roleId));
+            if (param.getRoleIds() != null && !param.getRoleIds().isEmpty()) {
+                for (int roleId : param.getRoleIds()) {
+                    userRoleService.save(new UserRole(param.getUserId(), roleId));
+                }
             }
-            Account account = new Account(param.getUserId(),"123456","");
-            accountService.save(account);
+
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -215,11 +239,35 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             removeById(id);
 //            删除用户角色信息
             userRoleService.remove(new QueryWrapper<UserRole>().eq("user_id", id));
-//            删除用户账号信息
-            accountService.remove(new QueryWrapper<Account>().eq("user_id", id));
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
+        return true;
+    }
+
+
+    @Transactional
+    @Override
+    public boolean unbindWX(String userId) {
+        //1.查询用户
+        User user = this.lambdaQuery().eq(User::getUserId, userId).one();
+        AssertUtils.notNull(user, HttpStatus.NOT_FOUND, "查无用户信息");
+        AssertUtils.notNull(user.getOpenId(), HttpStatus.NOT_FOUND, "用户无绑定微信账号");
+
+        //2.更新账号信息
+        LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(User::getOpenId, null).eq(User::getUserId, userId);
+        AssertUtils.isTrue(this.update(updateWrapper), HttpStatus.INTERNAL_SERVER_ERROR, "解绑失败");
+
+        //3.判断是否绑定学生信息
+        if (StringUtils.isNotBlank(user.getStudentId())) {
+            //更新学生认证信息
+            studentService.lambdaUpdate()
+                    .set(Student::getIsVerified, false)
+                    .eq(Student::getStudentId, user.getStudentId())
+                    .update();
+        }
+
         return true;
     }
 }

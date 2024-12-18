@@ -1,8 +1,10 @@
 package homework.soft.activity.entity.po;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serial;
@@ -19,19 +21,42 @@ public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = -62836068019278205L;
     /**
-     * 学号/学工号
+     * 用户id
      */
     @Schema(description = "学号/学工号")    
-    @TableId(value = "user_id")
+    @TableId(value = "user_id",type = IdType.ASSIGN_UUID)
     private String userId;
 
 
     /**
      * 姓名
      */
-    @Schema(description = "姓名")    
+    @Schema(description = "姓名")
     @TableField(value = "name")
     private String name;
+
+    /**
+     * 密码
+     */
+    @Schema(description = "密码")
+    @TableField(value = "password")
+    @JsonIgnore
+    private String password;
+
+    /**
+     * 微信openId
+     */
+    @Schema(description = "微信openId")
+    @TableField(value = "open_id")
+    @JsonIgnore
+    private String openId;
+
+    /**
+     * 学号
+     */
+    @Schema(description = "学号")
+    @TableField(value = "student_id")
+    private String studentId;
 
     /**
      * 学院/部门

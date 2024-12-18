@@ -1,5 +1,6 @@
 package homework.soft.activity.entity.po;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -18,7 +19,7 @@ import java.io.Serializable;
  * @since 2024-11-24 15:00:02
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(exclude = {"isVerified"})
 public class Student implements Serializable {
     @Serial
     private static final long serialVersionUID = -76004887998213437L;
@@ -26,7 +27,7 @@ public class Student implements Serializable {
      * 学生学号
      */
     @Schema(description = "学生学号")    
-    @TableId(value = "student_id")
+    @TableId(value = "student_id",type = IdType.INPUT)
 //    @JsonProperty("student_id")
     private String studentId;
 

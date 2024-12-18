@@ -21,9 +21,9 @@ public class UserWXPasswordBindDTO implements Serializable {
     @NotBlank
     private String code;
 
-    @Schema(description = "学号")
+    @Schema(description = "学号/学工号")
     @NotBlank
-    private String userId;
+    private String studentId;
     @Schema(description = "密码")
     @NotBlank
     private String password;

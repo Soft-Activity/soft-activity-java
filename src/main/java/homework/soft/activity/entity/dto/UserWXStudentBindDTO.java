@@ -76,6 +76,5 @@ public class UserWXStudentBindDTO implements Serializable {
      * 是否已认证0为认证，1已认证
      */
     @Schema(description = "是否已认证0为认证，1已认证")
-    @NotNull
     private Boolean isVerified;
 }

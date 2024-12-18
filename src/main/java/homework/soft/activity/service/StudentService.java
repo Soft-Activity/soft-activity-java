@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import homework.soft.activity.entity.po.Student;
 import homework.soft.activity.entity.dto.StudentQuery;
 import homework.soft.activity.entity.vo.StudentVO;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
@@ -40,6 +41,16 @@ public interface StudentService extends IService<Student> {
      * @return 数量
      */
     int count(StudentQuery param);
-
+    /**
+     * 获取学生学院列表
+     * @return 对象列表
+     */
+    List<String> getCollegeList();
+    /**
+     * 获取学生班级列表
+     * @param college 学院
+     * @return 对象列表
+     */
+    List<String> getClassList( String college);
 }
 

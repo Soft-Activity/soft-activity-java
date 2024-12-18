@@ -36,9 +36,9 @@ public class Activity implements Serializable {
     private String name;
 
     /**
-     * 组织者学号
+     * 组织者学号id
      */
-    @Schema(description = "组织者学号")    
+    @Schema(description = "组织者学号id")
     @TableField(value = "organizer_id")
     private String organizerId;
 
@@ -64,9 +64,9 @@ public class Activity implements Serializable {
     private String description;
 
     /**
-     * 是否取消 0未取消，1取消
+     * 是否取消 0未开始 1进行中 2 已结束 3 已取消
      */
-    @Schema(description = "是否取消 0未取消，1取消")    
+    @Schema(description = "是否取消 0未开始 1进行中 2 已结束 3 已取消")
     @TableField(value = "status")
     private Integer status;
 

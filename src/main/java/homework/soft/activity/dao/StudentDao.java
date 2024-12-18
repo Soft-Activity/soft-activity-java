@@ -9,6 +9,7 @@ import homework.soft.activity.entity.po.Student;
 import homework.soft.activity.entity.po.Student;
 import homework.soft.activity.entity.dto.StudentQuery;
 import homework.soft.activity.entity.vo.StudentVO;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * 学生(Student)表数据库访问层
@@ -57,7 +58,19 @@ public interface StudentDao extends BaseMapper<Student> {
     * @throws org.springframework.jdbc.BadSqlGrammarException 入参是空List的时候会抛SQL语句错误的异常，请自行校验入参
     */
     int insertOrUpdateBatch(@Param("entities") List<Student> entities);
-
+    /**
+     * 获取学生学院列表
+     * @return 对象列表
+     */
+    @Select("select college from student group by college")
+    List<String> getCollegeList();
+    /**
+     * 获取学生班级列表
+     * @param college 学院
+     * @return 对象列表
+     */
+    @Select("select classes from student where college = #{college} group by classes")
+    List<String> getClassList(String college);
 }
 
 

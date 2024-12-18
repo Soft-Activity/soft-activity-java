@@ -38,7 +38,7 @@ public class Comment implements Serializable {
     /**
      * 学生号
      */
-    @Schema(description = "学生号")    
+    @Schema(description = "学生用户id")
     @TableField(value = "student_id")
     private String studentId;
 
