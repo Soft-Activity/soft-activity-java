@@ -6,6 +6,7 @@
     <resultMap id="ActivityCategoryMap" type="homework.soft.activity.entity.po.ActivityCategory">
         <result property="categoryId" column="category_id" jdbcType="INTEGER"/>
         <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
     </resultMap>
     
     <resultMap id="ActivityCategoryVOMap" type="homework.soft.activity.entity.vo.ActivityCategoryVO" extends="ActivityCategoryMap" autoMapping="true"/>
@@ -26,6 +27,9 @@
             <if test="name != null and name != ''">
                 and `name` = #{name}
             </if>
+            <if test="description != null and description != ''">
+                and `description` = #{description}
+            </if>
         </where>
     </sql>
 
@@ -42,25 +46,43 @@
         from `activity_category`
         <include refid="queryCondition"/>
     </select>
- 
+    <select id="queryStatistics" resultType="homework.soft.activity.entity.vo.ActivityCategoryStatVO"
+            parameterType="homework.soft.activity.entity.dto.ActivityCategoryStatQuery">
+        select
+            ac.category_id,
+            ac.name ,
+            ac.description,
+            count(distinct a.activity_id) as total_activities,
+            count(distinct case when a.status = 0 then a.activity_id end) as not_started,
+            count(distinct case when a.status = 1 then a.activity_id end) as ongoing,
+            count(distinct case when a.status = 2 then a.activity_id end) as ended,
+            count(distinct case when a.status = 3 then a.activity_id end) as cancelled,
+            sum(a.capacity) as total_participants,
+            sum(a.max_capacity) as total_capacity
+        from activity_category ac
+                 left join activity a on ac.category_id = a.category_id
+        group by ac.category_id
+    </select>
+
 
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="categoryId" useGeneratedKeys="true">
-        insert into activity_category(name)
+        insert into activity_category(name,description)
         values
         <foreach collection="entities" item="entity" separator=",">
-        (#{entity.name})
+        (#{entity.name},#{entity.description})
         </foreach>
     </insert>
     <!-- 批量插入或按主键更新 -->
     <insert id="insertOrUpdateBatch" keyProperty="categoryId" useGeneratedKeys="true">
-        insert into activity_category(name)
+        insert into activity_category(name,description)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.name})
+            (#{entity.name},#{entity.description})
         </foreach>
         on duplicate key update
-           name = values(name)     
+           name = values(name) ,
+           description = values(description)
     </insert>
 
 </mapper>

@@ -2,6 +2,8 @@ package homework.soft.activity.dao;
 
 import java.util.List;
 
+import homework.soft.activity.entity.dto.ActivityCategoryStatQuery;
+import homework.soft.activity.entity.vo.ActivityCategoryStatVO;
 import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -58,6 +60,12 @@ public interface ActivityCategoryDao extends BaseMapper<ActivityCategory> {
     */
     int insertOrUpdateBatch(@Param("entities") List<ActivityCategory> entities);
 
+    /**
+     * 查询统计数据
+     * @param param 查询参数
+     * @return 统计数据
+     */
+    List<ActivityCategoryStatVO> queryStatistics(ActivityCategoryStatQuery param);
 }
 
 

@@ -3,8 +3,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import homework.soft.activity.dao.ActivityCategoryDao;
+import homework.soft.activity.entity.dto.ActivityCategoryStatQuery;
 import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.po.ActivityCategory;
+import homework.soft.activity.entity.vo.ActivityCategoryStatVO;
 import homework.soft.activity.service.ActivityCategoryService;
 import homework.soft.activity.entity.dto.ActivityCategoryQuery;
 import homework.soft.activity.entity.po.ActivityCategory;
@@ -46,6 +48,11 @@ public class ActivityCategoryServiceImpl extends ServiceImpl<ActivityCategoryDao
         queryWrapper.select("MAX(category_id) as category_id");
         ActivityCategory activityCategory = activityCategoryDao.selectOne(queryWrapper);
         return activityCategory != null ? activityCategory.getCategoryId() : null;
+    }
+
+    @Override
+    public List<ActivityCategoryStatVO> queryStatistics(ActivityCategoryStatQuery param) {
+        return activityCategoryDao.queryStatistics(param);
     }
 }
 

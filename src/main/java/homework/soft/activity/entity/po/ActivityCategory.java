@@ -34,5 +34,12 @@ public class ActivityCategory implements Serializable {
     @TableField(value = "name")
     private String name;
 
+    /**
+     * 描述
+     */
+    @Schema(description = "描述")
+    @TableField(value = "description")
+    private String description;
+
 
 }

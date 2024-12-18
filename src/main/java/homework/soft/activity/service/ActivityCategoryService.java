@@ -2,8 +2,10 @@ package homework.soft.activity.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import homework.soft.activity.entity.dto.ActivityCategoryStatQuery;
 import homework.soft.activity.entity.po.ActivityCategory;
 import homework.soft.activity.entity.dto.ActivityCategoryQuery;
+import homework.soft.activity.entity.vo.ActivityCategoryStatVO;
 import homework.soft.activity.entity.vo.ActivityCategoryVO;
 
 import java.util.List;
@@ -26,9 +28,9 @@ public interface ActivityCategoryService extends IService<ActivityCategory> {
     /**
      * 查询多条数据
      *
-     * @param current 查询页面
+     * @param current  查询页面
      * @param pageSize 查询条数
-     * @param param 查询参数
+     * @param param    查询参数
      * @return 对象列表
      */
     List<ActivityCategoryVO> queryAll(int current, int pageSize, ActivityCategoryQuery param);
@@ -42,5 +44,13 @@ public interface ActivityCategoryService extends IService<ActivityCategory> {
     int count(ActivityCategoryQuery param);
 
     int getMaxActivityCategoryId();
+
+    /**
+     * 查询统计数据
+     *
+     * @param param 查询参数
+     * @return 统计数据
+     */
+    List<ActivityCategoryStatVO> queryStatistics(ActivityCategoryStatQuery param);
 }
 

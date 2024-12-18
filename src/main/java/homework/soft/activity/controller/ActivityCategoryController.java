@@ -1,7 +1,9 @@
 package homework.soft.activity.controller;
 
 import homework.soft.activity.entity.dto.ActivityCategoryQuery;
+import homework.soft.activity.entity.dto.ActivityCategoryStatQuery;
 import homework.soft.activity.entity.po.ActivityCategory;
+import homework.soft.activity.entity.vo.ActivityCategoryStatVO;
 import homework.soft.activity.entity.vo.ActivityCategoryVO;
 import homework.soft.activity.service.ActivityCategoryService;
 import homework.soft.activity.util.beans.CommonResult;
@@ -37,8 +39,8 @@ public class ActivityCategoryController {
     @Operation(summary = "获取活动分类表列表")
     @GetMapping("/list")
     public CommonResult<ListResult<ActivityCategoryVO>> getActivityCategorys(@RequestParam(defaultValue = "1") Integer current,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            ActivityCategoryQuery param) {
+                                                                             @RequestParam(defaultValue = "10") Integer pageSize,
+                                                                             ActivityCategoryQuery param) {
         List<ActivityCategoryVO> list = activityCategoryService.queryAll(current, pageSize, param);
         int total = activityCategoryService.count(param);
         return CommonResult.success(new ListResult<>(list, total));
@@ -57,8 +59,8 @@ public class ActivityCategoryController {
     @Operation(summary = "修改指定活动分类表信息")
     @PutMapping("/update/{id}")
     public CommonResult<Boolean> updateActivityCategory(@PathVariable Integer id,
-            @RequestBody ActivityCategory param) {
-            param.setCategoryId(id);
+                                                        @RequestBody ActivityCategory param) {
+        param.setCategoryId(id);
         return activityCategoryService.updateById(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
 
@@ -66,5 +68,12 @@ public class ActivityCategoryController {
     @DeleteMapping("/delete/{id}")
     public CommonResult<Boolean> deleteActivityCategory(@PathVariable Integer id) {
         return activityCategoryService.removeById(id) ? CommonResult.success(true) : CommonResult.error(HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "获取活动分类统计列表")
+    @GetMapping("/statistics")
+    public CommonResult<List<ActivityCategoryStatVO>> getActivityCategoryStatistics(ActivityCategoryStatQuery param) {
+        List<ActivityCategoryStatVO> list = activityCategoryService.queryStatistics(param);
+        return CommonResult.success(list);
     }
 }
