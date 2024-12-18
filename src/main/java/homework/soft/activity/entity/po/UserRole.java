@@ -24,9 +24,9 @@ public class UserRole implements Serializable {
     @Serial
     private static final long serialVersionUID = -30696759645873659L;
     /**
-     * 学工号
+     * 用户id
      */
-    @Schema(description = "学工号")
+    @Schema(description = "用户id")
     @TableField(value = "user_id")
     private String userId;
 

@@ -119,8 +119,6 @@ public class UserController {
         return userService.unbindWX(userId) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "解绑失败");
     }
 
-    //用户个人操作功能软件
-
     @Operation(summary = "用户账号密码登录")
     @PostMapping("/login-by-password")
     public CommonResult<UserAuthVO> loginByPassword(@RequestBody @Validated UserPasswordLoginDTO param) {
