@@ -6,6 +6,7 @@ import homework.soft.activity.entity.dto.ActivityQuery;
 import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.vo.ActivityVO;
 import homework.soft.activity.service.ActivityService;
+import homework.soft.activity.util.AuthUtils;
 import homework.soft.activity.util.beans.CommonResult;
 import homework.soft.activity.util.beans.ListResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,12 +40,27 @@ public class ActivityController {
     @Operation(summary = "获取列表")
     @GetMapping("/list")
     public CommonResult<ListResult<ActivityVO>> getActivitys(@RequestParam(defaultValue = "1") Integer current,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            ActivityQuery param) {
+                                                             @RequestParam(defaultValue = "10") Integer pageSize,
+                                                             ActivityQuery param) {
         List<ActivityVO> list = activityService.queryAll(current, pageSize, param);
         int total = activityService.count(param);
         return CommonResult.success(new ListResult<>(list, total));
     }
+
+    @Operation(summary = "获取我的列表")
+    @GetMapping("/list-self")
+    @PermissionAuthorize
+    public CommonResult<ListResult<ActivityVO>> getMyActivitys(@RequestParam(defaultValue = "1") Integer current,
+                                                               @RequestParam(defaultValue = "10") Integer pageSize,
+                                                               ActivityQuery param) {
+        param.setStudentId(AuthUtils.getCurrentUserId());
+        List<ActivityVO> list = activityService.queryAll(current, pageSize, param);
+        int total = activityService.count(param);
+        return CommonResult.success(new ListResult<>(list, total));
+    }
+
+
+
 
     @Operation(summary = "添加")
     @PostMapping("/add")
@@ -60,8 +76,8 @@ public class ActivityController {
     @Operation(summary = "修改指定信息")
     @PutMapping("/update/{id}")
     public CommonResult<Boolean> updateActivity(@PathVariable Integer id,
-            @RequestBody Activity param) {
-            param.setActivityId(id);
+                                                @RequestBody Activity param) {
+        param.setActivityId(id);
         return activityService.updateById(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
 

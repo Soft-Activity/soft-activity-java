@@ -3,114 +3,145 @@
 <mapper namespace="homework.soft.activity.dao.ActivityDao">
 
 
-    <resultMap id="ActivityMap" type="homework.soft.activity.entity.po.Activity">
-        <result property="activityId" column="activity_id" jdbcType="INTEGER"/>
-        <result property="name" column="name" jdbcType="VARCHAR"/>
-        <result property="organizerId" column="organizer_id" jdbcType="VARCHAR"/>
-        <result property="categoryId" column="category_id" jdbcType="INTEGER"/>
-        <result property="location" column="location" jdbcType="VARCHAR"/>
-        <result property="description" column="description" jdbcType="VARCHAR"/>
-        <result property="status" column="status" jdbcType="INTEGER"/>
-        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
-        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
-        <result property="maxCapacity" column="max_capacity" jdbcType="INTEGER"/>
-        <result property="capacity" column="capacity" jdbcType="INTEGER"/>
-        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    <resultMap id="ActivityMap" type="homework.soft.activity.entity.po.Activity" autoMapping="true">
     </resultMap>
-    
-    <resultMap id="ActivityVOMap" type="homework.soft.activity.entity.vo.ActivityVO" extends="ActivityMap" autoMapping="true"/>
+
+    <resultMap id="ActivityVOMap" type="homework.soft.activity.entity.vo.ActivityVO" extends="ActivityMap"
+               autoMapping="true">
+    </resultMap>
 
     <!--查询单个-->
     <select id="queryById" resultMap="ActivityVOMap">
-        select *
-        from `activity`
+        select a.*,
+               ac.name                                                                     as category_name,
+               o.name                                                                      as organizer_name,
+               (select avg(c.rating) from `comment` c where c.activity_id = a.activity_id) as avg_rating
+        from `activity` a
+                 left join `activity_category` ac on `a`.`category_id` = `ac`.`category_id`
+                 left join `user` o on `a`.`organizer_id` = `o`.`user_id`
         where `activity_id` = #{activityId}
     </select>
 
-     <!--筛选条件-->
-   <sql id="queryCondition">
+    <!--筛选条件-->
+    <sql id="queryCondition">
         <where>
             <if test="activityId != null">
-                and `activity_id` = #{activityId}
+                and a.`activity_id` = #{activityId}
             </if>
             <if test="name != null and name != ''">
-                and `name` = #{name}
+                and a.`name` like concat('%', #{name} ,'%')
             </if>
             <if test="organizerId != null and organizerId != ''">
-                and `organizer_id` = #{organizerId}
+                and a.`organizer_id` = #{organizerId}
             </if>
             <if test="categoryId != null">
-                and `category_id` = #{categoryId}
+                and a.`category_id` = #{categoryId}
             </if>
             <if test="location != null and location != ''">
-                and `location` = #{location}
+                and a.`location` = #{location}
             </if>
             <if test="description != null and description != ''">
-                and `description` = #{description}
+                and a.`description` like concat( '%', #{description},'%' )
             </if>
             <if test="status != null">
-                and `status` = #{status}
+                and a.`status` = #{status}
             </if>
             <if test="startTime != null">
-                and `start_time` = #{startTime}
+                and a.`start_time` = #{startTime}
             </if>
             <if test="endTime != null">
-                and `end_time` = #{endTime}
+                and a.`end_time` = #{endTime}
             </if>
             <if test="maxCapacity != null">
-                and `max_capacity` = #{maxCapacity}
+                and a.`max_capacity` = #{maxCapacity}
             </if>
             <if test="capacity != null">
-                and `capacity` = #{capacity}
+                and a.`capacity` = #{capacity}
             </if>
             <if test="createTime != null">
-                and `create_time` = #{createTime}
+                and a.`create_time` = #{createTime}
+            </if>
+            <if test="statuses !=null and statuses.size()>0">
+                and a.`status` in
+                <foreach collection="statuses" item="status" open="(" close=")" separator=",">
+                    #{status}
+                </foreach>
+            </if>
+            <if test="categoryName != null and categoryName != ''">
+                and ac.`name` like concat('%', #{categoryName} ,'%')
+            </if>
+            <if test="organizerName != null and organizerName != ''">
+                and o.`name` like concat('%', #{organizerName} ,'%')
+            </if>
+            <if test="studentId != null and studentId != ''">
+                and exists(
+                select 1 from `registration` r
+                where r.`activity_id` = a.`activity_id`
+                and r.`student_id` = #{studentId}
+                and r.`status` = 0
+                )
+                <if test="isStudentComment != null ">
+                    and exists
+                    (select 1 from `comment` c
+                    where c.`activity_id` = a.`activity_id`
+                    and c.`student_id` = #{studentId}
+                    ) = #{isStudentComment}
+                </if>
             </if>
         </where>
     </sql>
 
     <!--查询指定行数据-->
     <select id="queryAll" resultMap="ActivityVOMap">
-        select *
-        from `activity`
+        select a.*,
+        ac.name as category_name,
+        o.name as organizer_name,
+        (select avg(c.rating) from `comment` c where c.activity_id = a.activity_id) as avg_rating
+        from `activity` a
+        left join `activity_category` ac on `a`.`category_id` = `ac`.`category_id`
+        left join `user` o on `a`.`organizer_id` = `o`.`user_id`
         <include refid="queryCondition"/>
     </select>
 
     <!--统计总行数-->
     <select id="count" resultType="java.lang.Integer">
         select count(1)
-        from `activity`
+        from `activity`  a
+        left join `activity_category` ac on `a`.`category_id` = `ac`.`category_id`
+        left join `user` o on `a`.`organizer_id` = `o`.`user_id`
         <include refid="queryCondition"/>
     </select>
 
 
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="activityId" useGeneratedKeys="true">
-        insert into activity(name,organizer_id,category_id,location,description,status,start_time,end_time,max_capacity,capacity,create_time)
+        insert into
+        activity(name,organizer_id,category_id,location,description,status,start_time,end_time,max_capacity,capacity,create_time)
         values
         <foreach collection="entities" item="entity" separator=",">
-        (#{entity.name},#{entity.organizerId},#{entity.categoryId},#{entity.location},#{entity.description},#{entity.status},#{entity.startTime},#{entity.endTime},#{entity.maxCapacity},#{entity.capacity},#{entity.createTime})
+            (#{entity.name},#{entity.organizerId},#{entity.categoryId},#{entity.location},#{entity.description},#{entity.status},#{entity.startTime},#{entity.endTime},#{entity.maxCapacity},#{entity.capacity},#{entity.createTime})
         </foreach>
     </insert>
     <!-- 批量插入或按主键更新 -->
     <insert id="insertOrUpdateBatch" keyProperty="activityId" useGeneratedKeys="true">
-        insert into activity(name,organizer_id,category_id,location,description,status,start_time,end_time,max_capacity,capacity,create_time)
+        insert into
+        activity(name,organizer_id,category_id,location,description,status,start_time,end_time,max_capacity,capacity,create_time)
         values
         <foreach collection="entities" item="entity" separator=",">
             (#{entity.name},#{entity.organizerId},#{entity.categoryId},#{entity.location},#{entity.description},#{entity.status},#{entity.startTime},#{entity.endTime},#{entity.maxCapacity},#{entity.capacity},#{entity.createTime})
         </foreach>
         on duplicate key update
-           name = values(name) ,
-           organizer_id = values(organizer_id) ,
-           category_id = values(category_id) ,
-           location = values(location) ,
-           description = values(description) ,
-           status = values(status) ,
-           start_time = values(start_time) ,
-           end_time = values(end_time) ,
-           max_capacity = values(max_capacity) ,
-           capacity = values(capacity) ,
-           create_time = values(create_time)     
+        name = values(name) ,
+        organizer_id = values(organizer_id) ,
+        category_id = values(category_id) ,
+        location = values(location) ,
+        description = values(description) ,
+        status = values(status) ,
+        start_time = values(start_time) ,
+        end_time = values(end_time) ,
+        max_capacity = values(max_capacity) ,
+        capacity = values(capacity) ,
+        create_time = values(create_time)
     </insert>
 
 </mapper>

@@ -1,16 +1,23 @@
 package homework.soft.activity.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import homework.soft.activity.dao.ActivityDao;
+import homework.soft.activity.entity.dto.CommentQuery;
 import homework.soft.activity.entity.po.Activity;
+import homework.soft.activity.entity.po.Comment;
+import homework.soft.activity.entity.po.Registration;
 import homework.soft.activity.service.ActivityService;
 import homework.soft.activity.entity.dto.ActivityQuery;
 import homework.soft.activity.entity.vo.ActivityVO;
+import homework.soft.activity.service.CommentService;
+import homework.soft.activity.service.RegistrationService;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 
 import java.util.List;
+
 /**
  * (Activity)表服务实现类
  *
@@ -22,24 +29,49 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityDao, Activity> impl
     @Resource
     private ActivityDao activityDao;
 
+    @Resource
+    private CommentService commentService;
+    @Resource
+    private RegistrationService registrationService;
+
+
     @Override
     public ActivityVO queryById(Integer activityId) {
-        return activityDao.queryById(activityId);
+        ActivityVO vo = activityDao.queryById(activityId);
+        fillVO(vo);
+        return vo;
     }
 
     @Override
     public List<ActivityVO> queryAll(int current, int pageSize, ActivityQuery param) {
-        PageHelper.startPage(current, pageSize);
-        return activityDao.queryAll(param);
+        if (current >= 0 && pageSize >= 0) {
+            PageHelper.startPage(current, pageSize);
+        }
+        List<ActivityVO> list = activityDao.queryAll(param);
+        list.forEach(this::fillVO);
+        return list;
+    }
+
+    private void fillVO(ActivityVO vo) {
+        if (vo == null) {
+            return;
+        }
+        if (vo.getActivityId() != null) {
+            CommentQuery query = new CommentQuery();
+            query.setActivityId(vo.getActivityId());
+            vo.setRecentComments(commentService.queryAll(1, 3, query));
+            vo.setCommentCount(commentService.count(query));
+        }
     }
 
     @Override
     public int count(ActivityQuery param) {
-        return activityDao.count();
+        return activityDao.count(param);
     }
 
     /**
      * 拿到自增id
+     *
      * @return
      */
     @Override

@@ -38,7 +38,7 @@ public interface ActivityDao extends BaseMapper<Activity> {
      *
      * @return 数量
      */
-    int count();
+    int count(ActivityQuery param);
     /**
     * 批量新增数据（MyBatis原生foreach方法）
     *
