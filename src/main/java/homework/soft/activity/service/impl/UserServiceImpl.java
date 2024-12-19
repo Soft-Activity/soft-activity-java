@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import homework.soft.activity.constant.enums.RoleType;
 import homework.soft.activity.dao.UserDao;
+import homework.soft.activity.entity.dto.UserChangePasswordDTO;
 import homework.soft.activity.entity.dto.UserCreateParm;
 import homework.soft.activity.entity.po.*;
 import homework.soft.activity.entity.vo.UserAuthVO;
@@ -75,10 +76,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     private boolean verifyPassword(String studentId, String password) {
-        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(User::getStudentId, studentId)
-                .eq(User::getPassword, password);
-        return this.count(queryWrapper) > 0;
+        User user = this.lambdaQuery().eq(User::getStudentId, studentId).one();
+        AssertUtils.notNull(user, HttpStatus.NOT_FOUND, "查无账号信息");
+
+        AssertUtils.isTrue(user.getPassword().equals(password), HttpStatus.BAD_REQUEST, "密码错误");
+        return true;
     }
 
     private boolean verifyStudent(String studentId, Student param) {
@@ -102,11 +104,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
 
     @Override
-    public UserAuthVO loginByPassword(String userId, String password) {
+    public UserAuthVO loginByPassword(String studentId, String password) {
         // 1.查询账号信息
-        AssertUtils.isTrue(verifyPassword(userId, password), HttpStatus.NOT_FOUND, "查无账号信息");
+        AssertUtils.isTrue(verifyPassword(studentId, password), HttpStatus.NOT_FOUND, "校验失败");
+
+        //2. 查询用户
+        User user = this.lambdaQuery().eq(User::getStudentId, studentId).one();
         //2.获得token
-        String token = JwtUtils.createJWTByUserId(userId);
+        String token = JwtUtils.createJWTByUserId(user.getUserId());
         return new UserAuthVO(token);
     }
 
@@ -225,10 +230,19 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     @Transactional
     public boolean updateUser(String id, UserCreateParm param) {
-        if (!deleteUser(id))
-            return false;
-//        更新用户信息
-        saveNewUser(param);
+        param.setUserId(id);
+        this.updateById(param);
+
+        if (param.getRoleIds() != null) {
+            //删除用户角色信息
+            userRoleService.remove(new QueryWrapper<UserRole>().eq("user_id", id));
+            //保存用户角色信息
+            if (param.getRoleIds() != null && !param.getRoleIds().isEmpty()) {
+                for (int roleId : param.getRoleIds()) {
+                    userRoleService.save(new UserRole(param.getUserId(), roleId));
+                }
+            }
+        }
         return true;
     }
 
@@ -269,6 +283,21 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
 
         return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean changePassword(String userId, UserChangePasswordDTO param) {
+        //1.查询用户
+        User user = this.lambdaQuery().eq(User::getUserId, userId).one();
+        AssertUtils.notNull(user, HttpStatus.NOT_FOUND, "查无用户信息");
+        //2.校验原密码
+        AssertUtils.isTrue(user.getPassword().equals(param.getOldPassword()), HttpStatus.BAD_REQUEST, "原密码错误");
+        //3.更新密码
+        return this.lambdaUpdate()
+                .set(User::getPassword, param.getNewPassword())
+                .eq(User::getUserId, userId)
+                .update();
     }
 }
 

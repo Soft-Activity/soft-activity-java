@@ -19,7 +19,7 @@ public class UserPasswordLoginDTO implements Serializable {
     private static final long serialVersionUID = -1218323211L;
     @Schema(description = "学号")
     @NotBlank
-    private String userId;
+    private String studentId;
     @Schema(description = "密码")
     @NotBlank
     private String password;

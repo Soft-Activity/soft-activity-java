@@ -2,6 +2,7 @@ package homework.soft.activity.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import homework.soft.activity.entity.dto.UserChangePasswordDTO;
 import homework.soft.activity.entity.dto.UserCreateParm;
 import homework.soft.activity.entity.po.Student;
 import homework.soft.activity.entity.po.User;
@@ -47,13 +48,13 @@ public interface UserService extends IService<User> {
     int count(UserQuery param);
 
     /**
-     * 用户通过账号密码登录
+     * 用户通过学号密码登录
      *
-     * @param userId 用户ID
+     * @param studentId 用户ID
      * @param password 用户密码
      * @return 用户认证信息
      */
-    UserAuthVO loginByPassword( String userId, String password);
+    UserAuthVO loginByPassword( String studentId, String password);
 
     /**
      * 用户通过微信登录
@@ -107,5 +108,13 @@ public interface UserService extends IService<User> {
      * @return 是否解绑成功
      */
     boolean unbindWX(String userId);
+    /**
+     * 修改密码
+     *
+     * @param userId 用户ID
+     * @param param 修改密码参数
+     * @return 是否修改成功
+     */
+    boolean changePassword(String userId, UserChangePasswordDTO param);
 }
 

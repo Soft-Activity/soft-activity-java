@@ -79,7 +79,13 @@ public class UserController {
     @PutMapping("/update/{id}")
     @PermissionAuthorize
     public CommonResult<Boolean> updateUser(@PathVariable String id, @RequestBody UserCreateParm param) {
+        // 只有超级管理员和用户本人可以修改用户信息
         AssertUtils.isTrue(AuthUtils.getUserDetails().getUserId().equals(id) || AuthUtils.hasAnyRole(RoleType.SUPER_ADMIN), HttpStatus.FORBIDDEN, "无权更新");
+
+        // 超级管理员可以修改用户角色
+        if (!AuthUtils.hasAnyRole(RoleType.SUPER_ADMIN)) {
+            param.setRoleIds(null);
+        }
         return userService.updateUser(id, param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "用户信息更新失败,请联系管理员");
     }
 
@@ -122,7 +128,7 @@ public class UserController {
     @Operation(summary = "用户账号密码登录")
     @PostMapping("/login-by-password")
     public CommonResult<UserAuthVO> loginByPassword(@RequestBody @Validated UserPasswordLoginDTO param) {
-        UserAuthVO auth = userService.loginByPassword(param.getUserId(), param.getPassword());
+        UserAuthVO auth = userService.loginByPassword(param.getStudentId(), param.getPassword());
         return CommonResult.success(auth);
     }
 
@@ -155,5 +161,13 @@ public class UserController {
     public CommonResult<Boolean> unbindMyWX() {
         String userId = AuthUtils.getUserDetails().getUserId();
         return userService.unbindWX(userId) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "解绑失败");
+    }
+
+    @Operation(summary = "用户修改密码")
+    @PostMapping("/change-password")
+    @PermissionAuthorize
+    public CommonResult<Boolean> changePassword(@RequestBody @Validated UserChangePasswordDTO param) {
+        String userId = AuthUtils.getUserDetails().getUserId();
+        return userService.changePassword(userId, param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "解绑失败");
     }
 }
