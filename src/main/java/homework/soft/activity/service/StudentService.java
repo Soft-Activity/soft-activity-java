@@ -28,9 +28,9 @@ public interface StudentService extends IService<Student> {
     /**
      * 查询多条数据
      *
-     * @param current 查询页面
+     * @param current  查询页面
      * @param pageSize 查询条数
-     * @param param 查询参数
+     * @param param    查询参数
      * @return 对象列表
      */
     List<StudentVO> queryAll(int current, int pageSize, StudentQuery param);
@@ -42,22 +42,36 @@ public interface StudentService extends IService<Student> {
      * @return 数量
      */
     int count(StudentQuery param);
+
     /**
      * 获取学生学院列表
+     *
      * @return 对象列表
      */
     List<String> getCollegeList();
+
     /**
      * 获取学生班级列表
-     * @param college 学院
+     *
+     * @param param 参数
      * @return 对象列表
      */
-    List<String> getClassList( StudentQuery param);
+    List<String> getClassList(StudentQuery param);
+
     /**
      * 批量导入学生信息
+     *
      * @param list 学生信息列表
      * @return 导入结果
      */
     ImportTotalResult batchImport(List<Student> list);
+
+    /**
+     * 添加学生信息
+     *
+     * @param student 学生信息
+     * @return 是否成功
+     */
+    boolean addStudent(Student student);
 }
 

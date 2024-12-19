@@ -32,7 +32,6 @@ public class Student implements Serializable {
     @TableId(value = "student_id", type = IdType.INPUT)
 //    @JsonProperty("student_id")
     @Excel(name = "学号", width = 15)
-    @NotBlank(message = "学号不能为空")
     private String studentId;
 
 
@@ -42,7 +41,7 @@ public class Student implements Serializable {
     @Schema(description = "姓名")
     @TableField(value = "name")
     @Excel(name = "姓名", width = 15)
-    @NotBlank(message = "姓名不能为空")
+
     private String name;
 
     /**
@@ -51,7 +50,6 @@ public class Student implements Serializable {
     @Schema(description = "学院")
     @TableField(value = "college")
     @Excel(name = "学院", width = 15)
-    @NotBlank(message = "学院不能为空")
     private String college;
 
     /**
@@ -60,7 +58,6 @@ public class Student implements Serializable {
     @Schema(description = "班级")
     @TableField(value = "classes")
     @Excel(name = "班级", width = 15)
-    @NotBlank(message = "班级不能为空")
     private String classes;
 
     /**
@@ -69,7 +66,6 @@ public class Student implements Serializable {
     @Schema(description = "年级")
     @TableField(value = "grade")
     @Excel(name = "年级", width = 15)
-    @NotBlank(message = "年级不能为空")
     private Integer grade;
 
     /**
@@ -78,7 +74,6 @@ public class Student implements Serializable {
     @Schema(description = "类型:本科生/研究生/博士生")
     @TableField(value = "type")
     @Excel(name = "类型", width = 15, addressList = true, replace = {"本科生_本科生", "研究生_研究生", "博士生_博士生"})
-    @NotBlank(message = "类型不能为空")
     private String type;
 
     /**
@@ -87,7 +82,6 @@ public class Student implements Serializable {
     @Schema(description = "性别 男/女")
     @TableField(value = "gender")
     @Excel(name = "性别", width = 15, replace = {"男_男", "女_女"}, addressList = true)
-    @NotBlank(message = "性别不能为空")
     private String gender;
 
     /**
@@ -95,7 +89,7 @@ public class Student implements Serializable {
      */
     @Schema(description = "是否已认证0为认证，1已认证")
     @TableField(value = "is_verified")
-    @Excel(name = "是否已认证", width = 15, replace = {"是_true", "否_false","_null"})
+    @Excel(name = "是否已认证", width = 15, replace = {"是_true", "否_false", "_null"})
     private Boolean isVerified;
 
 

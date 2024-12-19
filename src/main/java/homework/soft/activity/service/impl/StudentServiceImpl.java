@@ -16,8 +16,10 @@ import homework.soft.activity.entity.vo.StudentVO;
 import homework.soft.activity.service.UserService;
 import homework.soft.activity.util.AssertUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +44,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentDao, Student> impleme
 
     @Override
     public List<StudentVO> queryAll(int current, int pageSize, StudentQuery param) {
-        if(current >= 0 && pageSize >= 0) {
+        if (current >= 0 && pageSize >= 0) {
             PageHelper.startPage(current, pageSize);
         }
         return studentDao.queryAll(param);
@@ -90,21 +92,13 @@ public class StudentServiceImpl extends ServiceImpl<StudentDao, Student> impleme
                     continue;
                 }
                 //3. 保存
-                boolean success = this.save(student);
+                boolean success = super.save(student);
                 if (!success) {
                     result.getFailed().add(ImportRowResult.builder()
                             .success(false)
                             .message("保存失败: " + studentId).build());
                     continue;
                 }
-                UserCreateParm userCreateParm = new UserCreateParm();
-                userCreateParm.setStudentId(studentId);
-                userCreateParm.setName(student.getName());
-                userCreateParm.setGender(student.getGender());
-                userCreateParm.setCollege(student.getCollege());
-                userCreateParm.setRoleIds(List.of(RoleType.STUDENT.getRoleId()));
-                //保存用户
-                userService.saveNewUser(userCreateParm);
 
                 //4. 导入成功
                 result.getSuccess().add(ImportRowResult.builder()
@@ -118,6 +112,18 @@ public class StudentServiceImpl extends ServiceImpl<StudentDao, Student> impleme
             }
         }
         return result;
+    }
+
+    @Override
+    @Transactional
+    public boolean addStudent(Student student) {
+        AssertUtils.notNull(student, HttpStatus.BAD_REQUEST, "学生信息不能为空");
+        AssertUtils.notBlank(student.getStudentId(), HttpStatus.BAD_REQUEST, "学号不能为空");
+
+        boolean isExit = this.lambdaQuery().eq(Student::getStudentId, student.getStudentId()).exists();
+        AssertUtils.isTrue(!isExit, HttpStatus.BAD_REQUEST, "学号重复");
+
+        return super.save(student);
     }
 
     private boolean checkStudentId(String studentId) {

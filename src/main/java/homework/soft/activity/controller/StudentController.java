@@ -69,7 +69,7 @@ public class StudentController {
         if (checkStudentId(param.getStudentId())) {
             return CommonResult.error(HttpStatus.BAD_REQUEST, "学号格式错误");
         }
-        return studentService.save(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
+        return studentService.addStudent(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
 
     @Operation(summary = "修改指定学生信息")
