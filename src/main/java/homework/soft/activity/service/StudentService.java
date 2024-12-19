@@ -2,6 +2,7 @@ package homework.soft.activity.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import homework.soft.activity.entity.dto.ImportTotalResult;
 import homework.soft.activity.entity.po.Student;
 import homework.soft.activity.entity.dto.StudentQuery;
 import homework.soft.activity.entity.vo.StudentVO;
@@ -51,6 +52,12 @@ public interface StudentService extends IService<Student> {
      * @param college 学院
      * @return 对象列表
      */
-    List<String> getClassList( String college);
+    List<String> getClassList( StudentQuery param);
+    /**
+     * 批量导入学生信息
+     * @param list 学生信息列表
+     * @return 导入结果
+     */
+    ImportTotalResult batchImport(List<Student> list);
 }
 

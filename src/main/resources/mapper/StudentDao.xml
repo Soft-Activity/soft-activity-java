@@ -13,8 +13,9 @@
         <result property="gender" column="gender" jdbcType="VARCHAR"/>
         <result property="isVerified" column="is_verified" jdbcType="BOOLEAN"/>
     </resultMap>
-    
-    <resultMap id="StudentVOMap" type="homework.soft.activity.entity.vo.StudentVO" extends="StudentMap" autoMapping="true"/>
+
+    <resultMap id="StudentVOMap" type="homework.soft.activity.entity.vo.StudentVO" extends="StudentMap"
+               autoMapping="true"/>
 
     <!--查询单个-->
     <select id="queryById" resultMap="StudentVOMap">
@@ -23,8 +24,8 @@
         where `student_id` = #{studentId}
     </select>
 
-     <!--筛选条件-->
-   <sql id="queryCondition">
+    <!--筛选条件-->
+    <sql id="queryCondition">
         <where>
             <if test="studentId != null and studentId != ''">
                 and `student_id` = #{studentId}
@@ -66,14 +67,20 @@
         from `student`
         <include refid="queryCondition"/>
     </select>
- 
+    <select id="getClassList" resultType="java.lang.String">
+        select classes
+        from `student`
+        <include refid="queryCondition"/>
+        group by classes
+    </select>
+
 
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="studentId" useGeneratedKeys="true">
         insert into student(name,college,classes,grade,type,gender,is_verified)
         values
         <foreach collection="entities" item="entity" separator=",">
-        (#{entity.name},#{entity.college},#{entity.classes},#{entity.grade},#{entity.type},#{entity.gender},#{entity.isVerified})
+            (#{entity.name},#{entity.college},#{entity.classes},#{entity.grade},#{entity.type},#{entity.gender},#{entity.isVerified})
         </foreach>
     </insert>
     <!-- 批量插入或按主键更新 -->
@@ -84,13 +91,13 @@
             (#{entity.name},#{entity.college},#{entity.classes},#{entity.grade},#{entity.type},#{entity.gender},#{entity.isVerified})
         </foreach>
         on duplicate key update
-           name = values(name) ,
-           college = values(college) ,
-           classes = values(classes) ,
-           grade = values(grade) ,
-           type = values(type) ,
-           gender = values(gender) ,
-           is_verified = values(is_verified)     
+        name = values(name) ,
+        college = values(college) ,
+        classes = values(classes) ,
+        grade = values(grade) ,
+        type = values(type) ,
+        gender = values(gender) ,
+        is_verified = values(is_verified)
     </insert>
 
 </mapper>

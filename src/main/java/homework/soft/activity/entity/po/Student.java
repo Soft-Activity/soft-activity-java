@@ -1,5 +1,6 @@
 package homework.soft.activity.entity.po;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,6 +30,7 @@ public class Student implements Serializable {
     @Schema(description = "学生学号")    
     @TableId(value = "student_id",type = IdType.INPUT)
 //    @JsonProperty("student_id")
+    @Excel(name = "学号", width = 15)
     private String studentId;
 
 
@@ -37,6 +39,7 @@ public class Student implements Serializable {
      */
     @Schema(description = "姓名")    
     @TableField(value = "name")
+    @Excel(name = "姓名", width = 15)
     private String name;
 
     /**
@@ -44,6 +47,7 @@ public class Student implements Serializable {
      */
     @Schema(description = "学院")    
     @TableField(value = "college")
+    @Excel(name = "学院", width = 15)
     private String college;
 
     /**
@@ -51,6 +55,7 @@ public class Student implements Serializable {
      */
     @Schema(description = "班级")    
     @TableField(value = "classes")
+    @Excel(name = "班级", width = 15)
     private String classes;
 
     /**
@@ -58,6 +63,7 @@ public class Student implements Serializable {
      */
     @Schema(description = "年级")    
     @TableField(value = "grade")
+    @Excel(name = "年级", width = 15)
     private Integer grade;
 
     /**
@@ -65,6 +71,7 @@ public class Student implements Serializable {
      */
     @Schema(description = "类型:本科生/研究生/博士生")    
     @TableField(value = "type")
+    @Excel(name = "类型", width = 15)
     private String type;
 
     /**
@@ -72,6 +79,7 @@ public class Student implements Serializable {
      */
     @Schema(description = "性别 男/女")    
     @TableField(value = "gender")
+    @Excel(name = "性别", width = 15)
     private String gender;
 
     /**

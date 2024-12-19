@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import homework.soft.activity.entity.po.Student;
-import homework.soft.activity.entity.po.Student;
 import homework.soft.activity.entity.dto.StudentQuery;
 import homework.soft.activity.entity.vo.StudentVO;
 import org.apache.ibatis.annotations.Select;
@@ -66,11 +65,10 @@ public interface StudentDao extends BaseMapper<Student> {
     List<String> getCollegeList();
     /**
      * 获取学生班级列表
-     * @param college 学院
+     * @param param 学院
      * @return 对象列表
      */
-    @Select("select classes from student where college = #{college} group by classes")
-    List<String> getClassList(String college);
+    List<String> getClassList(StudentQuery param);
 }
 
 
