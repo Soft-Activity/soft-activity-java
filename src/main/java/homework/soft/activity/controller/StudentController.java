@@ -1,5 +1,6 @@
 package homework.soft.activity.controller;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import homework.soft.activity.annotation.PermissionAuthorize;
 import homework.soft.activity.constant.enums.RoleType;
 import homework.soft.activity.entity.dto.ImportTotalResult;
@@ -12,17 +13,25 @@ import homework.soft.activity.util.ExcelUtils;
 import homework.soft.activity.util.beans.CommonResult;
 import homework.soft.activity.util.beans.ListResult;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import jakarta.annotation.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 学生(Student)表控制层
@@ -94,8 +103,9 @@ public class StudentController {
 
     @Operation(summary = "批量导入学生")
     @PermissionAuthorize({RoleType.TEACHER})
-    @PostMapping("/batch-import")
-    public CommonResult<ImportTotalResult> batchImportStudents(@RequestParam MultipartFile file) {
+    @PostMapping(path = "/batch-import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public CommonResult<ImportTotalResult> batchImportStudents(@RequestParam("file") MultipartFile file) {
+
         List<Student> list = ExcelUtils.readExcel(file, Student.class);
         return CommonResult.success(studentService.batchImport(list));
     }
@@ -115,6 +125,7 @@ public class StudentController {
         student.setStudentId("2024152123");
         List<Student> list = new ArrayList<>();
         list.add(student);
+
         ExcelUtils.downloadExcel(response, Student.class, list, "批量导入模板");
     }
 

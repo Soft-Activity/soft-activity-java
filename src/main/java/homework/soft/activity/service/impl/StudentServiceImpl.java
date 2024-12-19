@@ -69,6 +69,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentDao, Student> impleme
         result.setFailed(new ArrayList<>());
         result.setSuccess(new ArrayList<>());
         for (Student student : list) {
+            if (student == null) {
+                continue;
+            }
             try {
                 //1.校验学号
                 String studentId = student.getStudentId();
@@ -122,7 +125,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentDao, Student> impleme
             return false;
         }
         //至少要10位以上数字
-        return !studentId.matches("\\d{10,}");
+        return !studentId.matches("202\\d{8}");
     }
 
 }

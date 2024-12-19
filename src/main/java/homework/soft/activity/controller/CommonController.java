@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +34,7 @@ public class CommonController {
      * @return 图片地址
      */
     @Operation(summary = "上传图片")
-    @PostMapping("/upload/image")
+    @PostMapping(path = "/upload/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CommonResult<String> uploadImage(@RequestParam("image") MultipartFile image) throws IOException {
         // 上传图片
         String filename= UploadUtils.upload(image, UploadModule.IMAGE.toString());
@@ -56,7 +57,7 @@ public class CommonController {
      * @return 文件地址
      */
     @Operation(summary = "上传文件")
-    @PostMapping("/upload/file")
+    @PostMapping(path = "/upload/file", consumes =MediaType.MULTIPART_FORM_DATA_VALUE)
     public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
         // 上传文件
         String filename= UploadUtils.upload(file, UploadModule.FILE.toString());
