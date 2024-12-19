@@ -6,6 +6,7 @@ import homework.soft.activity.entity.po.ActivityCategory;
 import homework.soft.activity.entity.vo.ActivityCategoryStatVO;
 import homework.soft.activity.entity.vo.ActivityCategoryVO;
 import homework.soft.activity.service.ActivityCategoryService;
+import homework.soft.activity.service.ActivityService;
 import homework.soft.activity.util.beans.CommonResult;
 import homework.soft.activity.util.beans.ListResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +29,8 @@ import java.util.List;
 public class ActivityCategoryController {
     @Resource
     private ActivityCategoryService activityCategoryService;
+    @Resource
+    private ActivityService activityService;
 
     @Operation(summary = "获取指定活动分类表信息")
     @GetMapping("/info/{id}")
@@ -42,6 +45,9 @@ public class ActivityCategoryController {
                                                                              @RequestParam(defaultValue = "10") Integer pageSize,
                                                                              ActivityCategoryQuery param) {
         List<ActivityCategoryVO> list = activityCategoryService.queryAll(current, pageSize, param);
+        for (ActivityCategoryVO vo : list) {
+          vo.setActivityCount(activityService.queryCount(vo.getCategoryId()));
+        }
         int total = activityCategoryService.count(param);
         return CommonResult.success(new ListResult<>(list, total));
     }

@@ -31,8 +31,6 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityDao, Activity> impl
 
     @Resource
     private CommentService commentService;
-    @Resource
-    private RegistrationService registrationService;
 
 
     @Override
@@ -80,6 +78,14 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityDao, Activity> impl
         queryWrapper.select("MAX(activity_id) as activity_id");
         Activity activity = activityDao.selectOne(queryWrapper);
         return activity != null ? activity.getActivityId() : 0;
+    }
+
+    @Override
+    public Integer queryCount(Integer categoryId) {
+//        使用mybaits-plus的查询方法,一个参数是查询条件，一个参数是查询字段
+        QueryWrapper<Activity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("category_id", categoryId);
+        return Math.toIntExact(activityDao.selectCount(queryWrapper));
     }
 }
 
