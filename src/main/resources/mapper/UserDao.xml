@@ -30,7 +30,7 @@
                 and `user_id` = #{userId}
             </if>
             <if test="name != null and name != ''">
-                and `name` = #{name}
+                and `name` like concat('%', #{name} ,'%')
             </if>
             <if test="password != null and password != ''">
                 and `password` = #{password}
@@ -39,16 +39,19 @@
                 and `open_id` = #{openId}
             </if>
             <if test="studentId != null and studentId != ''">
-                and `student_id` = #{studentId}
+                and `student_id` like concat('%', #{studentId},'%')
             </if>
             <if test="college != null and college != ''">
-                and `college` = #{college}
+                and `college` like concat('%',  #{college} ,'%')
             </if>
             <if test="avatar != null and avatar != ''">
                 and `avatar` = #{avatar}
             </if>
             <if test="gender != null and gender != ''">
                 and `gender` = #{gender}
+            </if>
+            <if test="roleId != null ">
+                and exists(select 1 from `user_role` ur where ur.user_id = user.user_id and ur.role_id = #{roleId})
             </if>
         </where>
     </sql>

@@ -72,7 +72,7 @@ public class UserController {
     @PostMapping("/add")
     @PermissionAuthorize(RoleType.SUPER_ADMIN)
     public CommonResult<Boolean> addUser(@RequestBody UserCreateParm param) {
-        return userService.saveNewUser(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "用户注册失败,请联系管理员");
+        return userService.saveNewUserForAdmin(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "用户注册失败,请联系管理员");
     }
 
     @Operation(summary = "修改指定用户信息")
@@ -94,6 +94,20 @@ public class UserController {
     @PermissionAuthorize(RoleType.SUPER_ADMIN)
     public CommonResult<Boolean> deleteUser(@PathVariable String id) {
         return userService.deleteUser(id) ? CommonResult.success(true) : CommonResult.error(HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "微信解绑")
+    @PostMapping("/unbind-wx/{userId}")
+    @PermissionAuthorize({RoleType.TEACHER, RoleType.TEACHER})
+    public CommonResult<Boolean> unbindWXByUserId(@PathVariable String userId) {
+        return userService.unbindWX(userId) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "解绑失败");
+    }
+
+    @Operation(summary = "重新设置学生密码")
+    @PostMapping("/reset-password")
+    @PermissionAuthorize(RoleType.TEACHER)
+    public CommonResult<Boolean> resetPassword(@RequestBody UserResetPasswordDTO param) {
+        return userService.resetPassword(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "重置密码失败");
     }
 
     //用户个人功能软件
@@ -118,12 +132,7 @@ public class UserController {
         return UploadUtils.getResponseEntity(UploadModule.USER_AVATAR.toString(), filename);
     }
 
-    @Operation(summary = "微信解绑")
-    @PostMapping("/unbind-wx/{userId}")
-    @PermissionAuthorize({RoleType.TEACHER, RoleType.TEACHER})
-    public CommonResult<Boolean> unbindWXByUserId(@PathVariable String userId) {
-        return userService.unbindWX(userId) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST, "解绑失败");
-    }
+
 
     @Operation(summary = "用户账号密码登录")
     @PostMapping("/login-by-password")

@@ -4,6 +4,7 @@ package homework.soft.activity.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import homework.soft.activity.entity.dto.UserChangePasswordDTO;
 import homework.soft.activity.entity.dto.UserCreateParm;
+import homework.soft.activity.entity.dto.UserResetPasswordDTO;
 import homework.soft.activity.entity.po.Student;
 import homework.soft.activity.entity.po.User;
 import homework.soft.activity.entity.dto.UserQuery;
@@ -37,7 +38,12 @@ public interface UserService extends IService<User> {
      * @return 对象列表
      */
     List<UserVO> queryAll(int current, int pageSize, UserQuery param);
-
+    /**
+     * 保存新用户
+     *
+     * @param param 用户创建参数
+     * @return 是否保存成功
+     */
     Boolean saveNewUser(UserCreateParm param);
     /**
      * 通过实体作为筛选条件计数
@@ -116,5 +122,19 @@ public interface UserService extends IService<User> {
      * @return 是否修改成功
      */
     boolean changePassword(String userId, UserChangePasswordDTO param);
+    /**
+     * 重置密码
+     *
+     * @param param 重置密码参数
+     * @return 是否重置成功
+     */
+    boolean resetPassword(UserResetPasswordDTO param);
+    /**
+     * 保存新用户
+     *
+     * @param param 用户创建参数
+     * @return 是否保存成功
+     */
+    boolean saveNewUserForAdmin(UserCreateParm param);
 }
 

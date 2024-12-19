@@ -9,6 +9,7 @@ import homework.soft.activity.constant.enums.RoleType;
 import homework.soft.activity.dao.UserDao;
 import homework.soft.activity.entity.dto.UserChangePasswordDTO;
 import homework.soft.activity.entity.dto.UserCreateParm;
+import homework.soft.activity.entity.dto.UserResetPasswordDTO;
 import homework.soft.activity.entity.po.*;
 import homework.soft.activity.entity.vo.UserAuthVO;
 import homework.soft.activity.exception.HttpErrorException;
@@ -60,6 +61,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             List<Role> roles = roleService.queryByUserId(userId);
             userVO.setRoles(roles);
         }
+        userVO.setBindWX(StringUtils.isNotBlank(userVO.getOpenId()));
+        userVO.setSetPassword(StringUtils.isNotBlank(userVO.getPassword()));
     }
 
     @Override
@@ -123,7 +126,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         //2. 查询用户
         User user = this.lambdaQuery().eq(User::getOpenId, openId).one();
         AssertUtils.notNull(user, HttpStatus.NOT_FOUND, "查无账号信息");
-        //2.获得token
+        //3. 判断用户是否已认证
+        AssertUtils.isTrue(StringUtils.isNotBlank(user.getStudentId()), HttpStatus.BAD_REQUEST, "用户未认证");
+        //4.获得token
         String token = JwtUtils.createJWTByUserId(user.getUserId());
         return new UserAuthVO(token);
     }
@@ -210,7 +215,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Transactional
     public Boolean saveNewUser(UserCreateParm param) {
         try {
-            param.setPassword("123456");
 //            保存用户信息
             this.save(param);
 //            保存用户角色信息
@@ -219,12 +223,18 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                     userRoleService.save(new UserRole(param.getUserId(), roleId));
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
         return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean saveNewUserForAdmin(UserCreateParm param) {
+        param.setPassword("123456");
+        return this.saveNewUser(param);
     }
 
     @Override
@@ -299,5 +309,21 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 .eq(User::getUserId, userId)
                 .update();
     }
+
+    @Override
+    @Transactional
+    public boolean resetPassword(UserResetPasswordDTO param) {
+        //1.查询用户
+        User user = this.lambdaQuery().eq(User::getStudentId, param.getUserId()).one();
+        AssertUtils.notNull(user, HttpStatus.NOT_FOUND, "查无用户信息");
+        //2.更新密码
+        return this.lambdaUpdate()
+                .set(User::getPassword, param.getNewPassword())
+                .eq(User::getUserId, user.getUserId())
+                .update();
+
+    }
+
+
 }
 
