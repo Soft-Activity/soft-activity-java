@@ -43,6 +43,7 @@ public class ExcelUtils {
         }
         return list;
     }
+
     /**
      * 读取 Excel 文件
      *
@@ -56,6 +57,19 @@ public class ExcelUtils {
         params.setTitleRows(0);
         params.setHeadRows(1);
 
+        return readExcel(file, clazz, params);
+    }
+
+    /**
+     * 读取 Excel 文件
+     *
+     * @param file   Excel 文件
+     * @param clazz  类
+     * @param params 参数
+     * @param <T>    泛型
+     * @return List<T> 数据
+     */
+    public static <T> List<T> readExcel(@RequestParam MultipartFile file, Class<T> clazz, ImportParams params) {
         List<T> list;
         try {
             list = ExcelImportUtil.importExcel(file.getInputStream(), clazz, params);
