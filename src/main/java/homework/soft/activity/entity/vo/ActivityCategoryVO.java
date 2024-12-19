@@ -13,4 +13,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ActivityCategoryVO extends ActivityCategory {
+    private Integer activityCount;
 }

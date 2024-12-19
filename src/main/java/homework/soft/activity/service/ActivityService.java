@@ -48,5 +48,6 @@ public interface ActivityService extends IService<Activity> {
      */
     int getMaxActivityId();
 
+    Integer queryCount(Integer categoryId);
 }
 
