@@ -1,7 +1,7 @@
 data:
   mysql:
     host: localhost
-    port: 3307
+    port: 3309
     database: soft
     username: root
     password: jscomet_@_21232
@@ -11,4 +11,6 @@ data:
     password: jscomet_@_21232
 
 app:
-  domain: localhost
+  domain: http://localhost
+  back:
+    url: http://localhost:8080
