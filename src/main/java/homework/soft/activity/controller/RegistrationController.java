@@ -4,13 +4,16 @@ import homework.soft.activity.annotation.PermissionAuthorize;
 import homework.soft.activity.entity.dto.RegistrationQuery;
 import homework.soft.activity.entity.po.Registration;
 import homework.soft.activity.entity.vo.RegistrationVO;
+import homework.soft.activity.entity.vo.UserVO;
 import homework.soft.activity.service.RegistrationService;
+import homework.soft.activity.service.impl.UserServiceImpl;
 import homework.soft.activity.util.AssertUtils;
 import homework.soft.activity.util.AuthUtils;
 import homework.soft.activity.util.beans.CommonResult;
 import homework.soft.activity.util.beans.ListResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +32,8 @@ import java.util.List;
 public class RegistrationController {
     @Resource
     private RegistrationService registrationService;
+    @Autowired
+    private UserServiceImpl userService;
 
     @Operation(summary = "获取指定报名表信息")
     @GetMapping("/info/{id}")
@@ -43,6 +48,15 @@ public class RegistrationController {
                                                                      @RequestParam(defaultValue = "10") Integer pageSize,
                                                                      RegistrationQuery param) {
         List<RegistrationVO> list = registrationService.queryAll(current, pageSize, param);
+
+//        遍历这个list，为每个VO补充数据
+        for (RegistrationVO registrationVO : list) {
+            String userId = registrationVO.getStudentId();
+            UserVO userVO = userService.queryById(userId);
+            registrationVO.setUserName(userVO.getName());
+            registrationVO.setCollegeName(userVO.getCollege());
+            registrationVO.setSchoolId(userVO.getStudentId());
+        }
         int total = registrationService.count(param);
         return CommonResult.success(new ListResult<>(list, total));
     }

@@ -6,6 +6,7 @@ import homework.soft.activity.entity.dto.ActivityQuery;
 import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.vo.ActivityVO;
 import homework.soft.activity.service.ActivityService;
+import homework.soft.activity.service.RegistrationService;
 import homework.soft.activity.util.AuthUtils;
 import homework.soft.activity.util.beans.CommonResult;
 import homework.soft.activity.util.beans.ListResult;
@@ -29,6 +30,8 @@ import java.util.List;
 public class ActivityController {
     @Resource
     private ActivityService activityService;
+    @Resource
+    private RegistrationService registrationService;
 
     @Operation(summary = "获取指定信息")
     @GetMapping("/info/{id}")
@@ -43,6 +46,10 @@ public class ActivityController {
                                                              @RequestParam(defaultValue = "10") Integer pageSize,
                                                              ActivityQuery param) {
         List<ActivityVO> list = activityService.queryAll(current, pageSize, param);
+//        遍历这个list，为每个VO补充数据
+        for (ActivityVO activityVO : list) {
+            activityVO.setCapacity(registrationService.getRegistrationCount(activityVO.getActivityId()));
+        }
         int total = activityService.count(param);
         return CommonResult.success(new ListResult<>(list, total));
     }
@@ -78,6 +85,8 @@ public class ActivityController {
     public CommonResult<Boolean> updateActivity(@PathVariable Integer id,
                                                 @RequestBody Activity param) {
         param.setActivityId(id);
+//        对status进行映射
+
         return activityService.updateById(param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
     }
 

@@ -63,5 +63,12 @@ public interface RegistrationService extends IService<Registration> {
      * @return 是否成功
      */
     boolean cancelRegister(String userId, Integer activityId);
+
+    /**
+     * 查询报名人数
+     * @param activityId 活动id
+     * @return 报名人数
+     */
+    int getRegistrationCount(Integer activityId);
 }
 
