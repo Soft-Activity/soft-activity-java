@@ -19,4 +19,12 @@ public class CommentVO extends Comment {
 
     @Schema(description = "评论者")
     private UserVO student;
+
+    @Schema(description = "学院")
+    private String collegeName;
+
+    @Schema(description = "学号")
+    private String schoolId;
+
+
 }

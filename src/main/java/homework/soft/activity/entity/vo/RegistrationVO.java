@@ -1,6 +1,7 @@
 package homework.soft.activity.entity.vo;
 
 import homework.soft.activity.entity.po.Registration;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,4 +14,10 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class RegistrationVO extends Registration {
+    @Schema(description = "用户名")
+    private String userName;
+    @Schema(description = "学院名称")
+    private String collegeName;
+    @Schema(description = "学号")
+    private String schoolId;
 }

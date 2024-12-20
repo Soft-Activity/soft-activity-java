@@ -93,6 +93,15 @@ public class RegistrationServiceImpl extends ServiceImpl<RegistrationDao, Regist
     }
 
     @Override
+    public int getRegistrationCount(Integer activityId) {
+//        使用mybaits plus
+        QueryWrapper<Registration> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("activity_id", activityId);
+        queryWrapper.eq("status", 0);
+        return Math.toIntExact(registrationDao.selectCount(queryWrapper));
+    }
+
+    @Override
     @Transactional
     public boolean registerActivity(String userId, Integer activityId) {
         //获取活动信息
