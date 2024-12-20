@@ -1,6 +1,7 @@
 package homework.soft.activity.entity.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -75,6 +76,7 @@ public class Activity implements Serializable {
      */
     @Schema(description = "活动开始时间")    
     @TableField(value = "start_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startTime;
 
     /**
@@ -82,6 +84,7 @@ public class Activity implements Serializable {
      */
     @Schema(description = "活动结束时间")    
     @TableField(value = "end_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;
 
     /**
