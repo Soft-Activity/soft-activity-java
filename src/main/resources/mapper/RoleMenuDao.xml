@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homework.soft.activity.dao.RoleMenuDao">
+
+
+    <resultMap id="RoleMenuMap" type="homework.soft.activity.entity.po.RoleMenu">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="roleId" column="role_id" jdbcType="INTEGER"/>
+        <result property="menuId" column="menu_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    
+    <resultMap id="RoleMenuVOMap" type="homework.soft.activity.entity.vo.RoleMenuVO" extends="RoleMenuMap" autoMapping="true"/>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="RoleMenuVOMap">
+        select *
+        from `role_menu`
+        where `id` = #{id}
+    </select>
+
+     <!--筛选条件-->
+   <sql id="queryCondition">
+        <where>
+            <if test="id != null">
+                and `id` = #{id}
+            </if>
+            <if test="roleId != null">
+                and `role_id` = #{roleId}
+            </if>
+            <if test="menuId != null">
+                and `menu_id` = #{menuId}
+            </if>
+            <if test="createTime != null">
+                and `create_time` = #{createTime}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="RoleMenuVOMap">
+        select *
+        from `role_menu`
+        <include refid="queryCondition"/>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(1)
+        from `role_menu`
+        <include refid="queryCondition"/>
+    </select>
+ 
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into role_menu(role_id,menu_id,create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.roleId},#{entity.menuId},#{entity.createTime})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into role_menu(role_id,menu_id,create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.roleId},#{entity.menuId},#{entity.createTime})
+        </foreach>
+        on duplicate key update
+           role_id = values(role_id) ,
+           menu_id = values(menu_id) ,
+           create_time = values(create_time)     
+    </insert>
+
+</mapper>
+
