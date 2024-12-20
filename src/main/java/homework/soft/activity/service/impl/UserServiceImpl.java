@@ -155,7 +155,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.set(User::getOpenId, openId).eq(User::getUserId, user.getUserId());
         AssertUtils.isTrue(this.update(updateWrapper), HttpStatus.INTERNAL_SERVER_ERROR, "绑定失败");
-        //6.返回信息
+
+        //7.更新认证状态(密码登录不需要校验是否成功)
+        LambdaUpdateWrapper<Student> updateStudent = new LambdaUpdateWrapper<>();
+        updateStudent.set(Student::getIsVerified, true).eq(Student::getStudentId, studentId);
+        studentService.update(updateStudent);
+
+
+        //8.返回信息
         String token = JwtUtils.createJWTByUserId(user.getUserId());
 
         return new UserAuthVO(token);
