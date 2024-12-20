@@ -59,9 +59,11 @@
     </select>
 
     <!--新增所有列-->
-    <insert id="insert" keyProperty="activityId" useGeneratedKeys="true">
-        insert into `activity_ai_review`(`ai_analysis`,`good_num`,`medium_num`,`poor_num`,`average_score`)
-        values (#{aiAnalysis},#{goodNum},#{mediumNum},#{poorNum},#{averageScore})
+    <insert id="insert">
+        insert into `activity_ai_review`
+        (`activity_id`, `ai_analysis`,`good_num`,`medium_num`,`poor_num`,`average_score`)
+        values
+        (#{activityId}, #{aiAnalysis},#{goodNum},#{mediumNum},#{poorNum},#{averageScore})
     </insert>
 
     <insert id="insertBatch" keyProperty="activityId" useGeneratedKeys="true">

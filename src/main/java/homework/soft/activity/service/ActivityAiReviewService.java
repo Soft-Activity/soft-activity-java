@@ -66,4 +66,6 @@ public interface ActivityAiReviewService {
     boolean deleteById(Integer activityId);
 
     ActivityAiReviewVO queryByIdCache(Integer id);
+
+    void insertEntry(ActivityAiReview param);
 }
