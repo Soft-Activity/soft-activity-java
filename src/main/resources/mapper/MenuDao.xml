@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homework.soft.activity.dao.MenuDao">
+
+
+    <resultMap id="MenuMap" type="homework.soft.activity.entity.po.Menu" autoMapping="true">
+    </resultMap>
+
+    <resultMap id="MenuVOMap" type="homework.soft.activity.entity.vo.MenuVO" extends="MenuMap" autoMapping="true"/>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="MenuMap">
+        select *
+        from `menu`
+        where `menu_id` = #{menuId}
+    </select>
+
+    <!--筛选条件-->
+    <sql id="queryCondition">
+        <where>
+            <if test="menuId != null">
+                and `menu_id` = #{menuId}
+            </if>
+            <if test="parentId != null">
+                and `parent_id` = #{parentId}
+            </if>
+            <if test="name != null and name != ''">
+                and `name` like concat('%', #{name},'%' )
+            </if>
+            <if test="path != null and path != ''">
+                and `path` = #{path}
+            </if>
+            <if test="component != null and component != ''">
+                and `component` = #{component}
+            </if>
+            <if test="redirect != null and redirect != ''">
+                and `redirect` = #{redirect}
+            </if>
+            <if test="title != null and title != ''">
+                and `title` like  concat('%',  #{title},'%')
+            </if>
+            <if test="icon != null and icon != ''">
+                and `icon` = #{icon}
+            </if>
+            <if test="sortOrder != null">
+                and `sort_order` = #{sortOrder}
+            </if>
+            <if test="hidden != null">
+                and `hidden` = #{hidden}
+            </if>
+            <if test="alwaysShow != null">
+                and `always_show` = #{alwaysShow}
+            </if>
+            <if test="keepAlive != null">
+                and `keep_alive` = #{keepAlive}
+            </if>
+            <if test="breadcrumb != null">
+                and `breadcrumb` = #{breadcrumb}
+            </if>
+            <if test="activeMenu != null and activeMenu != ''">
+                and `active_menu` = #{activeMenu}
+            </if>
+            <if test="noTagsView != null">
+                and `no_tags_view` = #{noTagsView}
+            </if>
+            <if test="canTo != null">
+                and `can_to` = #{canTo}
+            </if>
+            <if test="createTime != null">
+                and `create_time` = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and `update_time` = #{updateTime}
+            </if>
+            <if test="status != null">
+                and `status` = #{status}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="MenuMap">
+        select *
+        from `menu`
+        <include refid="queryCondition"/>
+        order by parent_id, sort_order
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(1)
+        from `menu`
+        <include refid="queryCondition"/>
+    </select>
+    <select id="selectMenusByRoleIds" resultType="homework.soft.activity.entity.po.Menu">
+        select distinct m.*
+        from menu m
+        inner join role_menu rm on m.menu_id = rm.menu_id
+        where rm.role_id in
+        <foreach collection="roleIds" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+        and m.status = 1
+        order by m.parent_id, m.sort_order
+    </select>
+
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="menuId" useGeneratedKeys="true">
+        insert into menu(parent_id,name,path,component,redirect,title,icon,sort_order,hidden,always_show,keep_alive,breadcrumb,active_menu,no_tags_view,can_to,create_time,update_time,status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.parentId},#{entity.name},#{entity.path},#{entity.component},#{entity.redirect},#{entity.title},#{entity.icon},#{entity.sortOrder},#{entity.hidden},#{entity.alwaysShow},#{entity.keepAlive},#{entity.breadcrumb},#{entity.activeMenu},#{entity.noTagsView},#{entity.canTo},#{entity.createTime},#{entity.updateTime},#{entity.status})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="menuId" useGeneratedKeys="true">
+        insert into menu(parent_id,name,path,component,redirect,title,icon,sort_order,hidden,always_show,keep_alive,breadcrumb,active_menu,no_tags_view,can_to,create_time,update_time,status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.parentId},#{entity.name},#{entity.path},#{entity.component},#{entity.redirect},#{entity.title},#{entity.icon},#{entity.sortOrder},#{entity.hidden},#{entity.alwaysShow},#{entity.keepAlive},#{entity.breadcrumb},#{entity.activeMenu},#{entity.noTagsView},#{entity.canTo},#{entity.createTime},#{entity.updateTime},#{entity.status})
+        </foreach>
+        on duplicate key update
+           parent_id = values(parent_id) ,
+           name = values(name) ,
+           path = values(path) ,
+           component = values(component) ,
+           redirect = values(redirect) ,
+           title = values(title) ,
+           icon = values(icon) ,
+           sort_order = values(sort_order) ,
+           hidden = values(hidden) ,
+           always_show = values(always_show) ,
+           keep_alive = values(keep_alive) ,
+           breadcrumb = values(breadcrumb) ,
+           active_menu = values(active_menu) ,
+           no_tags_view = values(no_tags_view) ,
+           can_to = values(can_to) ,
+           create_time = values(create_time) ,
+           update_time = values(update_time) ,
+           status = values(status)
+    </insert>
+
+</mapper>
+
