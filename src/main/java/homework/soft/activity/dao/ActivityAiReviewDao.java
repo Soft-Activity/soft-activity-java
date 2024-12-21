@@ -46,7 +46,7 @@ public interface ActivityAiReviewDao {
      * @param param 创建参数
      * @return 影响行数
      */
-    int insert(ActivityAiReviewCreateParam param);
+    int insert(ActivityAiReview param);
 
     /**
      * 批量新增数据（MyBatis原生foreach方法）

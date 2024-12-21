@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * (ActivityAiReview)表服务实现类
@@ -62,7 +63,24 @@ public class ActivityAiReviewServiceImpl implements ActivityAiReviewService {
 
     @Override
     public ActivityAiReviewVO queryByIdCache(Integer id) {
-        Map<Object, Object> reviewMap = redisTemplate.opsForHash().entries("activityAiReview:" + id);
+        String cacheKey = "activityAiReview:" + id;
+        if (!redisTemplate.hasKey(cacheKey)) {
+            ActivityAiReviewVO review = queryById(id);
+            if (review != null) {
+                Map<String, Object> reviewMap = new HashMap<>();
+                reviewMap.put("activityId", review.getActivityId());
+                reviewMap.put("aiAnalysis", review.getAiAnalysis());
+                reviewMap.put("goodNum", review.getGoodNum());
+                reviewMap.put("mediumNum", review.getMediumNum());
+                reviewMap.put("poorNum", review.getPoorNum());
+                reviewMap.put("averageScore", review.getAverageScore());
+                
+                redisTemplate.opsForHash().putAll(cacheKey, reviewMap);
+            }
+            return review;
+        }
+
+        Map<Object, Object> reviewMap = redisTemplate.opsForHash().entries(cacheKey);
         if (reviewMap.isEmpty()) {
             return null;
         }
@@ -76,5 +94,10 @@ public class ActivityAiReviewServiceImpl implements ActivityAiReviewService {
         activityAiReviewVO.setAverageScore((Double) reviewMap.get("averageScore"));
 
         return activityAiReviewVO;
+    }
+
+    @Override
+    public void insertEntry(ActivityAiReview param) {
+        activityAiReviewDao.insert(param);
     }
 }
