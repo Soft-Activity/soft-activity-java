@@ -7,6 +7,8 @@ import lombok.Data;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -77,6 +79,7 @@ public class Activity implements Serializable {
     @Schema(description = "活动开始时间")    
     @TableField(value = "start_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startTime;
 
     /**
@@ -85,6 +88,7 @@ public class Activity implements Serializable {
     @Schema(description = "活动结束时间")    
     @TableField(value = "end_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime endTime;
 
     /**

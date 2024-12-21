@@ -2,6 +2,7 @@ package homework.soft.activity.dao;
 
 import java.util.List;
 
+import homework.soft.activity.entity.vo.ActivityRecentMonthStatVO;
 import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -55,6 +56,11 @@ public interface ActivityDao extends BaseMapper<Activity> {
     * @throws org.springframework.jdbc.BadSqlGrammarException 入参是空List的时候会抛SQL语句错误的异常，请自行校验入参
     */
     int insertOrUpdateBatch(@Param("entities") List<Activity> entities);
+    /**
+     * 获取最大的活动id
+     * @return
+     */
+    List<ActivityRecentMonthStatVO> statisticsRecentMonth();
 
 
     /**

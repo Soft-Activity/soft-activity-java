@@ -1,10 +1,14 @@
 package homework.soft.activity.entity.dto;
 
+import homework.soft.activity.config.valid.QueryGroup;
+import homework.soft.activity.config.valid.Sorter;
+import homework.soft.activity.config.valid.SorterValidated;
 import homework.soft.activity.entity.po.Activity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -33,4 +37,8 @@ public class ActivityQuery extends Activity {
 
     @Schema(description = "参与学生是否评论")
     private Boolean isStudentComment;
+
+    @SorterValidated(groups = {QueryGroup.class})
+    private Sorter sorter;
+
 }
