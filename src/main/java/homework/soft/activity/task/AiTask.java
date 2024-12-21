@@ -7,6 +7,7 @@ import homework.soft.activity.entity.po.ActivityAiReview;
 import homework.soft.activity.entity.po.Comment;
 import homework.soft.activity.service.ActivityAiReviewService;
 import homework.soft.activity.service.CommentService;
+import homework.soft.activity.service.ActivityService;
 import homework.soft.activity.util.HttpRequestUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ContentType;
@@ -43,6 +44,8 @@ public class AiTask {
     private CommentService commentService;
     @Autowired
     private ActivityAiReviewService activityAiReviewService;
+    @Autowired
+    private ActivityService activityService;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -63,6 +66,12 @@ public class AiTask {
                     .collect(Collectors.groupingBy(Comment::getActivityId));
 
             groupedComments.forEach((activityId, commentList) -> {
+                // 首先检查活动是否存在
+                if (activityService.getById(activityId) == null) {
+                    log.warn("活动ID {} 不存在，跳过处理", activityId);
+                    return;
+                }
+                
                 ActivityAiReview activityAiReview = new ActivityAiReview();
                 // 统计评论中rating > 3, rating == 3, rating < 3的个数
                 long countGreaterThan3 = commentList.stream().filter(comment -> comment.getRating() > 3).count();
