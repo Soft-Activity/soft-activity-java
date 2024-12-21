@@ -4,6 +4,7 @@ package homework.soft.activity.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.dto.ActivityQuery;
+import homework.soft.activity.entity.vo.ActivityRecentMonthStatVO;
 import homework.soft.activity.entity.vo.ActivityVO;
 
 import java.util.List;
@@ -26,9 +27,9 @@ public interface ActivityService extends IService<Activity> {
     /**
      * 查询多条数据
      *
-     * @param current 查询页面
+     * @param current  查询页面
      * @param pageSize 查询条数
-     * @param param 查询参数
+     * @param param    查询参数
      * @return 对象列表
      */
     List<ActivityVO> queryAll(int current, int pageSize, ActivityQuery param);
@@ -44,10 +45,24 @@ public interface ActivityService extends IService<Activity> {
 
     /**
      * 拿到自增id
+     *
      * @return
      */
     int getMaxActivityId();
 
+    /**
+     * 通过实体作为筛选条件计数
+     *
+     * @param categoryId 查询参数
+     * @return 数量
+     */
     Integer queryCount(Integer categoryId);
+
+    /**
+     * 获取最近一个月的活动统计
+     *
+     * @return 活动统计
+     */
+    List<ActivityRecentMonthStatVO> statisticsRecentMonth();
 }
 

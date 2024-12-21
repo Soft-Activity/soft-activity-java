@@ -1,7 +1,12 @@
 package homework.soft.activity.entity.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 /**
  * Description
@@ -12,5 +17,26 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ActivityCategoryStatQuery extends ActivityCategoryQuery {
+
+    /**
+     * 活动状态
+     */
+    @Schema(description = "活动状态")
+    private Integer activityStatus;
+
+    /**
+     * 活动开始时间
+     */
+    @Schema(description = "活动开始时间")
+    //使用IOS格式
+    @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME )
+    private LocalDateTime activityStartTime;
+
+    /**
+     * 活动结束时间
+     */
+    @Schema(description = "活动结束时间")
+    @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime activityEndTime;
 
 }

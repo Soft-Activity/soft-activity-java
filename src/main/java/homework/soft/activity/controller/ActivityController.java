@@ -1,9 +1,11 @@
 package homework.soft.activity.controller;
 
 import homework.soft.activity.annotation.PermissionAuthorize;
+import homework.soft.activity.config.valid.QueryGroup;
 import homework.soft.activity.constant.enums.RoleType;
 import homework.soft.activity.entity.dto.ActivityQuery;
 import homework.soft.activity.entity.po.Activity;
+import homework.soft.activity.entity.vo.ActivityRecentMonthStatVO;
 import homework.soft.activity.entity.vo.ActivityVO;
 import homework.soft.activity.service.ActivityService;
 import homework.soft.activity.service.RegistrationService;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import jakarta.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,7 +47,7 @@ public class ActivityController {
     @GetMapping("/list")
     public CommonResult<ListResult<ActivityVO>> getActivitys(@RequestParam(defaultValue = "1") Integer current,
                                                              @RequestParam(defaultValue = "10") Integer pageSize,
-                                                             ActivityQuery param) {
+                                                             @Validated(QueryGroup.class) ActivityQuery param) {
         List<ActivityVO> list = activityService.queryAll(current, pageSize, param);
 //        遍历这个list，为每个VO补充数据
         for (ActivityVO activityVO : list) {
@@ -94,5 +97,12 @@ public class ActivityController {
     @DeleteMapping("/delete/{id}")
     public CommonResult<Boolean> deleteActivity(@PathVariable Integer id) {
         return activityService.removeById(id) ? CommonResult.success(true) : CommonResult.error(HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "统计最近一个月内的活动统计情况")
+    @GetMapping("/statistics-recent-month")
+    public CommonResult<List<ActivityRecentMonthStatVO>> getActivityRecentMonthStatistics() {
+
+        return CommonResult.success(activityService.statisticsRecentMonth());
     }
 }

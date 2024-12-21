@@ -25,7 +25,7 @@
                 and `category_id` = #{categoryId}
             </if>
             <if test="name != null and name != ''">
-                and `name` = #{name}
+                and `name` like concat('%', #{name} ,'%')
             </if>
             <if test="description != null and description != ''">
                 and `description` = #{description}
@@ -46,6 +46,31 @@
         from `activity_category`
         <include refid="queryCondition"/>
     </select>
+
+
+    <!--筛选条件-->
+    <sql id="queryStatCondition">
+        <where>
+            <if test="categoryId != null">
+                and a.`category_id` = #{categoryId}
+            </if>
+            <if test="name != null and name != ''">
+                and ac.`name` like concat('%', #{name} ,'%')
+            </if>
+            <if test="description != null and description != ''">
+                and ac.`description` = #{description}
+            </if>
+            <if test="activityStatus != null">
+                and a.status = #{activityStatus}
+            </if>
+            <if test="activityStartTime != null">
+                and a.start_time &gt;= #{activityStartTime}
+            </if>
+            <if test="activityEndTime != null">
+                and a.end_time &lt;= #{activityEndTime}
+            </if>
+        </where>
+    </sql>
     <select id="queryStatistics" resultType="homework.soft.activity.entity.vo.ActivityCategoryStatVO"
             parameterType="homework.soft.activity.entity.dto.ActivityCategoryStatQuery">
         select
@@ -61,6 +86,7 @@
             sum(a.max_capacity) as total_capacity
         from activity_category ac
                  left join activity a on ac.category_id = a.category_id
+        <include refid="queryStatCondition"/>
         group by ac.category_id
     </select>
 

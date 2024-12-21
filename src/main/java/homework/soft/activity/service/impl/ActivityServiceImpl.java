@@ -8,6 +8,7 @@ import homework.soft.activity.entity.dto.CommentQuery;
 import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.po.Comment;
 import homework.soft.activity.entity.po.Registration;
+import homework.soft.activity.entity.vo.ActivityRecentMonthStatVO;
 import homework.soft.activity.service.ActivityService;
 import homework.soft.activity.entity.dto.ActivityQuery;
 import homework.soft.activity.entity.vo.ActivityVO;
@@ -86,6 +87,11 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityDao, Activity> impl
         QueryWrapper<Activity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("category_id", categoryId);
         return Math.toIntExact(activityDao.selectCount(queryWrapper));
+    }
+
+    @Override
+    public List<ActivityRecentMonthStatVO> statisticsRecentMonth() {
+        return activityDao.statisticsRecentMonth();
     }
 }
 

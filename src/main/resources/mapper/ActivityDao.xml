@@ -47,10 +47,10 @@
                 and a.`status` = #{status}
             </if>
             <if test="startTime != null">
-                and a.`start_time` = #{startTime}
+                and a.`start_time` &gt;=  #{startTime}
             </if>
             <if test="endTime != null">
-                and a.`end_time` = #{endTime}
+                and a.`end_time` &lt;= #{endTime}
             </if>
             <if test="maxCapacity != null">
                 and a.`max_capacity` = #{maxCapacity}
@@ -101,6 +101,11 @@
         left join `activity_category` ac on `a`.`category_id` = `ac`.`category_id`
         left join `user` o on `a`.`organizer_id` = `o`.`user_id`
         <include refid="queryCondition"/>
+        <choose>
+            <when test="sorter != null and sorter.column != null and sorter.mode != null">
+                order by  ${sorter.column} ${sorter.mode} ,activity_id
+            </when>
+        </choose>
     </select>
 
     <!--统计总行数-->
@@ -110,6 +115,18 @@
         left join `activity_category` ac on `a`.`category_id` = `ac`.`category_id`
         left join `user` o on `a`.`organizer_id` = `o`.`user_id`
         <include refid="queryCondition"/>
+    </select>
+    <select id="statisticsRecentMonth" resultType="homework.soft.activity.entity.vo.ActivityRecentMonthStatVO">
+        select
+        date(start_time) as date,
+        count(*) as activity_count,
+        sum(capacity) as total_participants
+        from activity
+        where start_time >= date_sub(curdate(), interval 30 day)
+        and start_time &lt;= curdate()
+        and status !=3
+        group by date(start_time)
+        order by date;
     </select>
 
 
