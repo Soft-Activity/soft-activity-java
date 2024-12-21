@@ -55,7 +55,7 @@ public class AiTask {
     //    一个月后失效2025-01-01
     private static final String ACCESS_TOKEN = "24.eb417cb37ffa093ff69f8fec8ef6bf82.2592000.1735657327.282335-116474815";
 
-    @Scheduled(fixedRate = 180000) // 每半小时执行一次，将数据写入缓存中
+    @Scheduled(fixedRate = 1800000) // 每半小时执行一次，将数据写入缓存中
     public void cacheComments() {
         log.info("定时任务开始执行");
         try {
