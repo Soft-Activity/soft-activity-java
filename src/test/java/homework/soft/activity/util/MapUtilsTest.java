@@ -2,6 +2,8 @@ package homework.soft.activity.util;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -37,6 +39,76 @@ class MapUtilsTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 测试Point类的getter和setter方法
+     */
+    @Test
+    public void testPointGetterSetter() {
+        MapUtils.Point point = new MapUtils.Point();
+        point.setLat(40.0);
+        point.setLng(120.0);
+
+        assertEquals(40.0, point.getLat());
+        assertEquals(120.0, point.getLng());
+    }
+
+    /**
+     * 测试坐标转换的异常情况
+     */
+    @Test
+    public void testConvertWithInvalidMode() {
+        MapUtils.Point sourcePoint = MapUtils.Point.builder()
+                .lat(39.915119)
+                .lng(116.403963)
+                .build();
+
+        assertThrows(IOException.class, () -> {
+            MapUtils.convert(sourcePoint, 999); // 使用无效的mode
+        });
+    }
+
+    /**
+     * 测试不同模式的坐标转换
+     */
+    @Test
+    public void testConvertWithDifferentModes() throws IOException {
+        MapUtils.Point sourcePoint = MapUtils.Point.builder()
+                .lat(39.915119)
+                .lng(116.403963)
+                .build();
+        // 测试GPS坐标转百度坐标(mode=2)
+        MapUtils.Point gpsConverted = MapUtils.convert(sourcePoint, 2);
+        assertNotNull(gpsConverted);
+        // 测试百度经纬度坐标转百度墨卡托坐标(mode=3)
+        MapUtils.Point mcConverted = MapUtils.convert(sourcePoint, 3);
+        assertNotNull(mcConverted);
+    }
+    /**
+     * 测试计算两点之间距离的边界情况
+     */
+    @Test
+    public void testGetDistanceEdgeCases() throws IOException {
+        // 测试相同点之间的距离
+        MapUtils.Point samePoint = MapUtils.Point.builder()
+                .lat(39.915119)
+                .lng(116.403963)
+                .build();
+        double distance = MapUtils.getDistance(samePoint, samePoint);
+        assertEquals(0, distance);
+        // 测试较远距离的两点
+        MapUtils.Point farPoint1 = MapUtils.Point.builder()
+                .lat(31.239692)
+                .lng(121.499755)
+                .build(); // 上海
+        MapUtils.Point farPoint2 = MapUtils.Point.builder()
+                .lat(39.915119)
+                .lng(116.403963)
+                .build(); // 北京
+
+        double longDistance = MapUtils.getDistance(farPoint1, farPoint2);
+        assertTrue(longDistance > 1000000); // 距离应该大于1000公里
     }
 
 }
