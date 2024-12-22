@@ -323,7 +323,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Transactional
     public boolean resetPassword(UserResetPasswordDTO param) {
         //1.查询用户
-        User user = this.lambdaQuery().eq(User::getStudentId, param.getUserId()).one();
+        User user = this.lambdaQuery().eq(User::getUserId, param.getUserId()).one();
         AssertUtils.notNull(user, HttpStatus.NOT_FOUND, "查无用户信息");
         //2.更新密码
         return this.lambdaUpdate()
