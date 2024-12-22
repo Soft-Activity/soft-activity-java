@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homework.soft.activity.dao.ActivityLocationDao">
+
+
+    <resultMap id="ActivityLocationMap" type="homework.soft.activity.entity.po.ActivityLocation">
+        <result property="locationId" column="location_id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="lat" column="lat" jdbcType="NUMERIC"/>
+        <result property="lng" column="lng" jdbcType="NUMERIC"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    
+    <resultMap id="ActivityLocationVOMap" type="homework.soft.activity.entity.vo.ActivityLocationVO" extends="ActivityLocationMap" autoMapping="true"/>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ActivityLocationVOMap">
+        select *
+        from `activity_location`
+        where `location_id` = #{locationId}
+    </select>
+
+     <!--筛选条件-->
+   <sql id="queryCondition">
+        <where>
+            <if test="locationId != null">
+                and `location_id` = #{locationId}
+            </if>
+            <if test="name != null and name != ''">
+                and `name` like concat('%', #{name},'%' )
+            </if>
+            <if test="lat != null">
+                and `lat` = #{lat}
+            </if>
+            <if test="lng != null">
+                and `lng` = #{lng}
+            </if>
+            <if test="createTime != null">
+                and `create_time` = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and `update_time` = #{updateTime}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="ActivityLocationVOMap">
+        select *
+        from `activity_location`
+        <include refid="queryCondition"/>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(1)
+        from `activity_location`
+        <include refid="queryCondition"/>
+    </select>
+ 
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="locationId" useGeneratedKeys="true">
+        insert into activity_location(name,lat,lng,create_time,update_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.name},#{entity.lat},#{entity.lng},#{entity.createTime},#{entity.updateTime})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="locationId" useGeneratedKeys="true">
+        insert into activity_location(name,lat,lng,create_time,update_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.name},#{entity.lat},#{entity.lng},#{entity.createTime},#{entity.updateTime})
+        </foreach>
+        on duplicate key update
+           name = values(name) ,
+           lat = values(lat) ,
+           lng = values(lng) ,
+           create_time = values(create_time) ,
+           update_time = values(update_time)     
+    </insert>
+
+</mapper>
+
