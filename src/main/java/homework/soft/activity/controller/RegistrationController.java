@@ -1,6 +1,7 @@
 package homework.soft.activity.controller;
 
 import homework.soft.activity.annotation.PermissionAuthorize;
+import homework.soft.activity.entity.dto.ActivityCheckInParam;
 import homework.soft.activity.entity.dto.RegistrationQuery;
 import homework.soft.activity.entity.po.Registration;
 import homework.soft.activity.entity.vo.RegistrationVO;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import jakarta.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -86,6 +88,23 @@ public class RegistrationController {
         AssertUtils.isTrue(AuthUtils.isAuthenticated(), HttpStatus.UNAUTHORIZED, "请先登录");
         String userId = AuthUtils.getCurrentUserId();
         return registrationService.registerActivity(userId, activityId) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
+    }
+
+    @Operation(summary = "打卡活动")
+    @PostMapping("/check-in")
+    @PermissionAuthorize
+    public CommonResult<Boolean> checkInActivity(@RequestBody @Validated ActivityCheckInParam param) {
+        AssertUtils.isTrue(AuthUtils.isAuthenticated(), HttpStatus.UNAUTHORIZED, "请先登录");
+        String userId = AuthUtils.getCurrentUserId();
+        return registrationService.checkInActivity(userId, param) ? CommonResult.success(true) : CommonResult.error(HttpStatus.BAD_REQUEST);
+    }
+
+    @Operation(summary = "是否已打卡")
+    @PostMapping("/check-in/{activityId}")
+    @PermissionAuthorize
+    public CommonResult<Boolean> isCheckin(@PathVariable Integer activityId) {
+        String userId = AuthUtils.getCurrentUserId();
+        return  CommonResult.success(registrationService.isCheckIn(userId, activityId)) ;
     }
 
     @Operation(summary = "获取我是否报名过活动")

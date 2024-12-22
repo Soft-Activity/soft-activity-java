@@ -2,6 +2,7 @@ package homework.soft.activity.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import homework.soft.activity.entity.dto.ActivityCheckInParam;
 import homework.soft.activity.entity.po.Registration;
 import homework.soft.activity.entity.dto.RegistrationQuery;
 import homework.soft.activity.entity.vo.RegistrationVO;
@@ -55,7 +56,7 @@ public interface RegistrationService extends IService<Registration> {
      * @param activityId 活动id
      * @return 是否报名过
      */
-    Boolean isRegister(String userId, Integer activityId);
+    boolean isRegister(String userId, Integer activityId);
     /**
      * 取消报名
      * @param userId 用户id
@@ -70,5 +71,25 @@ public interface RegistrationService extends IService<Registration> {
      * @return 报名人数
      */
     int getRegistrationCount(Integer activityId);
+    /**
+     * 打卡
+     * @param userId 用户id
+     * @param param 打卡参数
+     * @return 是否成功
+     */
+    boolean checkInActivity(String userId, ActivityCheckInParam param);
+    /**
+     * 查询打卡人数
+     * @param activityId 活动id
+     * @return 打卡人数
+     */
+    int getCheckInCount(Integer activityId);
+    /**
+     * 是否已打卡
+     * @param userId 用户id
+     * @param activityId 活动id
+     * @return 是否已打卡
+     */
+    boolean isCheckIn(String userId, Integer activityId);
 }
 

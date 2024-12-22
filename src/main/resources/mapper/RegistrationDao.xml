@@ -9,6 +9,10 @@
         <result property="activityId" column="activity_id" jdbcType="INTEGER"/>
         <result property="status" column="status" jdbcType="INTEGER"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="isCheckIn" column="is_check_in" jdbcType="BOOLEAN"/>
+        <result property="checkInTime" column="check_in_time" jdbcType="TIMESTAMP"/>
+        <result property="checkInLat" column="check_in_lat" jdbcType="NUMERIC"/>
+        <result property="checkInLng" column="check_in_lng" jdbcType="NUMERIC"/>
     </resultMap>
     
     <resultMap id="RegistrationVOMap" type="homework.soft.activity.entity.vo.RegistrationVO" extends="RegistrationMap" autoMapping="true"/>
@@ -38,6 +42,18 @@
             <if test="createTime != null">
                 and `create_time` = #{createTime}
             </if>
+            <if test="isCheckIn != null">
+                and `is_check_in` = #{isCheckIn}
+            </if>
+            <if test="checkInTime != null">
+                and `check_in_time` = #{checkInTime}
+            </if>
+            <if test="checkInLat != null">
+                and `check_in_lat` = #{checkInLat}
+            </if>
+            <if test="checkInLng != null">
+                and `check_in_lng` = #{checkInLng}
+            </if>
         </where>
     </sql>
 
@@ -58,24 +74,28 @@
 
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="registrationId" useGeneratedKeys="true">
-        insert into registration(student_id,activity_id,status,create_time)
+        insert into registration(student_id,activity_id,status,create_time,is_check_in,check_in_time,check_in_lat,check_in_lng)
         values
         <foreach collection="entities" item="entity" separator=",">
-        (#{entity.studentId},#{entity.activityId},#{entity.status},#{entity.createTime})
+        (#{entity.studentId},#{entity.activityId},#{entity.status},#{entity.createTime},#{entity.isCheckIn},#{entity.checkInTime},#{entity.checkInLat},#{entity.checkInLng})
         </foreach>
     </insert>
     <!-- 批量插入或按主键更新 -->
     <insert id="insertOrUpdateBatch" keyProperty="registrationId" useGeneratedKeys="true">
-        insert into registration(student_id,activity_id,status,create_time)
+        insert into registration(student_id,activity_id,status,create_time,is_check_in,check_in_time,check_in_lat,check_in_lng)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.studentId},#{entity.activityId},#{entity.status},#{entity.createTime})
+            (#{entity.studentId},#{entity.activityId},#{entity.status},#{entity.createTime},#{entity.isCheckIn},#{entity.checkInTime},#{entity.checkInLat},#{entity.checkInLng})
         </foreach>
         on duplicate key update
            student_id = values(student_id) ,
            activity_id = values(activity_id) ,
            status = values(status) ,
-           create_time = values(create_time)     
+           create_time = values(create_time) ,
+           is_check_in = values(is_check_in) ,
+           check_in_time = values(check_in_time) ,
+           check_in_lat = values(check_in_lat) ,
+           check_in_lng = values(check_in_lng)
     </insert>
 
 </mapper>
