@@ -9,11 +9,14 @@ import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.po.Comment;
 import homework.soft.activity.entity.po.Registration;
 import homework.soft.activity.entity.vo.ActivityRecentMonthStatVO;
+import homework.soft.activity.service.ActivityLocationService;
 import homework.soft.activity.service.ActivityService;
 import homework.soft.activity.entity.dto.ActivityQuery;
 import homework.soft.activity.entity.vo.ActivityVO;
 import homework.soft.activity.service.CommentService;
 import homework.soft.activity.service.RegistrationService;
+import homework.soft.activity.util.AssertUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 
@@ -32,6 +35,12 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityDao, Activity> impl
 
     @Resource
     private CommentService commentService;
+
+    @Resource
+    private RegistrationService registrationService;
+
+    @Resource
+    private ActivityLocationService activityLocationService;
 
 
     @Override
@@ -60,12 +69,26 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityDao, Activity> impl
             query.setActivityId(vo.getActivityId());
             vo.setRecentComments(commentService.queryAll(1, 3, query));
             vo.setCommentCount(commentService.count(query));
+            vo.setCapacity(registrationService.getRegistrationCount(vo.getActivityId()));
+            vo.setCheckInCount(registrationService.getCheckInCount(vo.getActivityId()));
+            vo.setCheckInLocationName(activityLocationService.getLocationName(vo.getCheckInLocationId()));
         }
+
     }
 
     @Override
     public int count(ActivityQuery param) {
         return activityDao.count(param);
+    }
+
+    public boolean save(Activity activity) {
+        // 检查签到地点
+        if (Boolean.TRUE.equals(activity.getIsCheckIn())) {
+            AssertUtils.notNull(activity.getCheckInLocationId(), HttpStatus.BAD_REQUEST, "签到地点不能为空");
+            AssertUtils.notNull(activity.getCheckInStartTime(), HttpStatus.BAD_REQUEST, "签到开始时间不能为空");
+            AssertUtils.notNull(activity.getCheckInEndTime(), HttpStatus.BAD_REQUEST, "签到结束时间不能为空");
+        }
+        return super.save(activity);
     }
 
     /**

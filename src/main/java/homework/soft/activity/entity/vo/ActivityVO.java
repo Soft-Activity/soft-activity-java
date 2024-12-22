@@ -32,4 +32,10 @@ public class ActivityVO extends Activity {
     @Schema(description = "评论总数")
     private Integer commentCount;
 
+    @Schema(description = "已打卡人数")
+    private Integer checkInCount;
+
+    @Schema(description = "打卡地点名称")
+    private String checkInLocationName;
+
 }

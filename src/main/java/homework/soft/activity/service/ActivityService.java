@@ -50,6 +50,7 @@ public interface ActivityService extends IService<Activity> {
      */
     int getMaxActivityId();
 
+
     /**
      * 通过实体作为筛选条件计数
      *

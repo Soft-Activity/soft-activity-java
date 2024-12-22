@@ -28,15 +28,16 @@ public class ActivityCategoryStatQuery extends ActivityCategoryQuery {
      * 活动开始时间
      */
     @Schema(description = "活动开始时间")
-    //使用IOS格式
-    @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME )
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime activityStartTime;
 
     /**
      * 活动结束时间
      */
     @Schema(description = "活动结束时间")
-    @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime activityEndTime;
 
 }

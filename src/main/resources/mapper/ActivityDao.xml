@@ -87,6 +87,29 @@
                     and c.`student_id` = #{studentId}
                     ) = #{isStudentComment}
                 </if>
+                <if test="isStudentCheckIn != null ">
+                    and exists
+                    (select 1 from `registration` r
+                    where r.`activity_id` = a.`activity_id`
+                    and r.`student_id` = #{studentId}
+                    and r.`is_check_in` = #{isStudentCheckIn}
+                    )
+                </if>
+            </if>
+            <if test="isCheckIn != null">
+                and `is_check_in` = #{isCheckIn}
+            </if>
+            <if test="checkInLocationId != null">
+                and `check_in_location_id` = #{checkInLocationId}
+            </if>
+            <if test="checkInRadius != null">
+                and `check_in_radius` = #{checkInRadius}
+            </if>
+            <if test="checkInStartTime != null">
+                and `check_in_start_time` = #{checkInStartTime}
+            </if>
+            <if test="checkInEndTime != null">
+                and `check_in_end_time` = #{checkInEndTime}
             </if>
         </where>
     </sql>
@@ -132,33 +155,36 @@
 
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="activityId" useGeneratedKeys="true">
-        insert into
-        activity(name,organizer_id,category_id,location,description,status,start_time,end_time,max_capacity,capacity,create_time)
+        insert into activity(name,organizer_id,category_id,location,description,status,start_time,end_time,max_capacity,capacity,create_time,is_check_in,check_in_location_id,check_in_radius,check_in_start_time,check_in_end_time)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.name},#{entity.organizerId},#{entity.categoryId},#{entity.location},#{entity.description},#{entity.status},#{entity.startTime},#{entity.endTime},#{entity.maxCapacity},#{entity.capacity},#{entity.createTime})
+        (#{entity.name},#{entity.organizerId},#{entity.categoryId},#{entity.location},#{entity.description},#{entity.status},#{entity.startTime},#{entity.endTime},#{entity.maxCapacity},#{entity.capacity},#{entity.createTime},#{entity.isCheckIn},#{entity.checkInLocationId},#{entity.checkInRadius},#{entity.checkInStartTime},#{entity.checkInEndTime})
         </foreach>
     </insert>
     <!-- 批量插入或按主键更新 -->
     <insert id="insertOrUpdateBatch" keyProperty="activityId" useGeneratedKeys="true">
-        insert into
-        activity(name,organizer_id,category_id,location,description,status,start_time,end_time,max_capacity,capacity,create_time)
+        insert into activity(name,organizer_id,category_id,location,description,status,start_time,end_time,max_capacity,capacity,create_time,is_check_in,check_in_location_id,check_in_radius,check_in_start_time,check_in_end_time)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.name},#{entity.organizerId},#{entity.categoryId},#{entity.location},#{entity.description},#{entity.status},#{entity.startTime},#{entity.endTime},#{entity.maxCapacity},#{entity.capacity},#{entity.createTime})
+            (#{entity.name},#{entity.organizerId},#{entity.categoryId},#{entity.location},#{entity.description},#{entity.status},#{entity.startTime},#{entity.endTime},#{entity.maxCapacity},#{entity.capacity},#{entity.createTime},#{entity.isCheckIn},#{entity.checkInLocationId},#{entity.checkInRadius},#{entity.checkInStartTime},#{entity.checkInEndTime})
         </foreach>
         on duplicate key update
-        name = values(name) ,
-        organizer_id = values(organizer_id) ,
-        category_id = values(category_id) ,
-        location = values(location) ,
-        description = values(description) ,
-        status = values(status) ,
-        start_time = values(start_time) ,
-        end_time = values(end_time) ,
-        max_capacity = values(max_capacity) ,
-        capacity = values(capacity) ,
-        create_time = values(create_time)
+           name = values(name) ,
+           organizer_id = values(organizer_id) ,
+           category_id = values(category_id) ,
+           location = values(location) ,
+           description = values(description) ,
+           status = values(status) ,
+           start_time = values(start_time) ,
+           end_time = values(end_time) ,
+           max_capacity = values(max_capacity) ,
+           capacity = values(capacity) ,
+           create_time = values(create_time) ,
+           is_check_in = values(is_check_in) ,
+           check_in_location_id = values(check_in_location_id) ,
+           check_in_radius = values(check_in_radius) ,
+           check_in_start_time = values(check_in_start_time) ,
+           check_in_end_time = values(check_in_end_time)
     </insert>
 
 </mapper>

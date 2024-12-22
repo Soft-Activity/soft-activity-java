@@ -79,7 +79,7 @@ public class Activity implements Serializable {
     @Schema(description = "活动开始时间")    
     @TableField(value = "start_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startTime;
 
     /**
@@ -88,7 +88,7 @@ public class Activity implements Serializable {
     @Schema(description = "活动结束时间")    
     @TableField(value = "end_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;
 
     /**
@@ -110,7 +110,48 @@ public class Activity implements Serializable {
      */
     @Schema(description = "创建时间")    
     @TableField(value = "create_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
+
+    /**
+     * 是否需要打卡 0否 1是
+     */
+    @Schema(description = "是否需要打卡 0否 1是")
+    @TableField(value = "is_check_in")
+    private Boolean isCheckIn;
+
+    /**
+     * 打卡地点ID
+     */
+    @Schema(description = "打卡地点ID")
+    @TableField(value = "check_in_location_id")
+    private Integer checkInLocationId;
+
+    /**
+     * 打卡范围(单位:米)
+     */
+    @Schema(description = "打卡范围(单位:米)")
+    @TableField(value = "check_in_radius")
+    private Integer checkInRadius;
+
+    /**
+     * 打卡开始时间
+     */
+    @Schema(description = "打卡开始时间")
+    @TableField(value = "check_in_start_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime checkInStartTime;
+
+    /**
+     * 打卡结束时间
+     */
+    @Schema(description = "打卡结束时间")
+    @TableField(value = "check_in_end_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime checkInEndTime;
 
 
 }

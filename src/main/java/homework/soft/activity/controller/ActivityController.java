@@ -49,10 +49,6 @@ public class ActivityController {
                                                              @RequestParam(defaultValue = "10") Integer pageSize,
                                                              @Validated(QueryGroup.class) ActivityQuery param) {
         List<ActivityVO> list = activityService.queryAll(current, pageSize, param);
-//        遍历这个list，为每个VO补充数据
-        for (ActivityVO activityVO : list) {
-            activityVO.setCapacity(registrationService.getRegistrationCount(activityVO.getActivityId()));
-        }
         int total = activityService.count(param);
         return CommonResult.success(new ListResult<>(list, total));
     }

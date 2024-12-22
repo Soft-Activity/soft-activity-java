@@ -67,7 +67,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Override
     public List<UserVO> queryAll(int current, int pageSize, UserQuery param) {
-        PageHelper.startPage(current, pageSize);
+        if(current>=0 && pageSize>=0){
+            PageHelper.startPage(current, pageSize);
+        }
         List<UserVO> list = userDao.queryAll(param);
         list.forEach(this::fillVO);
         return list;

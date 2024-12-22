@@ -38,6 +38,9 @@ public class ActivityQuery extends Activity {
     @Schema(description = "参与学生是否评论")
     private Boolean isStudentComment;
 
+    @Schema(description = "参与学生是否打卡")
+    private Boolean isStudentCheckIn;
+
     @SorterValidated(groups = {QueryGroup.class})
     private Sorter sorter;
 
