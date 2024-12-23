@@ -2,10 +2,12 @@ package homework.soft.activity.util;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import homework.soft.activity.exception.HttpErrorException;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,11 +15,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -114,6 +120,7 @@ public class ExcelUtils {
         workbook.write(response.getOutputStream());
     }
 
+
     public static <T> void exportExcel(FileOutputStream fileOutputStream, Class<T> clazz, List<T> list) throws
             IOException {
         try (Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), clazz, list)) {
@@ -121,4 +128,5 @@ public class ExcelUtils {
         }
 
     }
+
 }

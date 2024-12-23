@@ -7,12 +7,14 @@ import homework.soft.activity.dao.RegistrationDao;
 import homework.soft.activity.entity.dto.ActivityCheckInParam;
 import homework.soft.activity.entity.po.*;
 import homework.soft.activity.entity.vo.ActivityVO;
+import homework.soft.activity.entity.vo.UserVO;
 import homework.soft.activity.service.ActivityLocationService;
 import homework.soft.activity.service.ActivityService;
 import homework.soft.activity.service.RegistrationService;
 import homework.soft.activity.entity.dto.RegistrationQuery;
 import homework.soft.activity.entity.po.Registration;
 import homework.soft.activity.entity.vo.RegistrationVO;
+import homework.soft.activity.service.UserService;
 import homework.soft.activity.util.AssertUtils;
 import homework.soft.activity.util.AuthUtils;
 import homework.soft.activity.util.MapUtils;
@@ -38,16 +40,36 @@ public class RegistrationServiceImpl extends ServiceImpl<RegistrationDao, Regist
     private ActivityService activityService;
     @Resource
     private ActivityLocationService activityLocationService;
+    @Resource
+    private UserService userService;
 
     @Override
     public RegistrationVO queryById(Integer registrationId) {
-        return registrationDao.queryById(registrationId);
+        RegistrationVO vo = registrationDao.queryById(registrationId);
+        fillVO(vo);
+        return vo;
     }
 
     @Override
     public List<RegistrationVO> queryAll(int current, int pageSize, RegistrationQuery param) {
-        PageHelper.startPage(current, pageSize);
-        return registrationDao.queryAll(param);
+        if(current>=0 && pageSize>=0) {
+            PageHelper.startPage(current, pageSize);
+        }
+        List<RegistrationVO> list = registrationDao.queryAll(param);
+        list.forEach(this::fillVO);
+        return list;
+    }
+
+    private void fillVO(RegistrationVO vo) {
+        if(vo==null){
+            return;
+        }
+        if(vo.getStudentId()!=null){
+            UserVO user = userService.queryById(vo.getStudentId());
+            vo.setCollegeName(user.getCollege());
+            vo.setUserName(user.getName());
+            vo.setSchoolId(user.getStudentId());
+        }
     }
 
     @Override

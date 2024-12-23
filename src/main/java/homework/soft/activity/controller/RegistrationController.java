@@ -3,24 +3,32 @@ package homework.soft.activity.controller;
 import homework.soft.activity.annotation.PermissionAuthorize;
 import homework.soft.activity.entity.dto.ActivityCheckInParam;
 import homework.soft.activity.entity.dto.RegistrationQuery;
+import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.po.Registration;
+import homework.soft.activity.entity.vo.RegistrationExportVO;
 import homework.soft.activity.entity.vo.RegistrationVO;
 import homework.soft.activity.entity.vo.UserVO;
+import homework.soft.activity.service.ActivityService;
 import homework.soft.activity.service.RegistrationService;
 import homework.soft.activity.service.impl.UserServiceImpl;
 import homework.soft.activity.util.AssertUtils;
 import homework.soft.activity.util.AuthUtils;
+import homework.soft.activity.util.ExcelUtils;
 import homework.soft.activity.util.beans.CommonResult;
 import homework.soft.activity.util.beans.ListResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 报名表(Registration)表控制层
@@ -36,6 +44,8 @@ public class RegistrationController {
     private RegistrationService registrationService;
     @Autowired
     private UserServiceImpl userService;
+    @Resource
+    private ActivityService activityService;
 
     @Operation(summary = "获取指定报名表信息")
     @GetMapping("/info/{id}")
@@ -51,14 +61,6 @@ public class RegistrationController {
                                                                      RegistrationQuery param) {
         List<RegistrationVO> list = registrationService.queryAll(current, pageSize, param);
 
-//        遍历这个list，为每个VO补充数据
-        for (RegistrationVO registrationVO : list) {
-            String userId = registrationVO.getStudentId();
-            UserVO userVO = userService.queryById(userId);
-            registrationVO.setUserName(userVO.getName());
-            registrationVO.setCollegeName(userVO.getCollege());
-            registrationVO.setSchoolId(userVO.getStudentId());
-        }
         int total = registrationService.count(param);
         return CommonResult.success(new ListResult<>(list, total));
     }
@@ -104,7 +106,7 @@ public class RegistrationController {
     @PermissionAuthorize
     public CommonResult<Boolean> isCheckin(@PathVariable Integer activityId) {
         String userId = AuthUtils.getCurrentUserId();
-        return  CommonResult.success(registrationService.isCheckIn(userId, activityId)) ;
+        return CommonResult.success(registrationService.isCheckIn(userId, activityId));
     }
 
     @Operation(summary = "获取我是否报名过活动")
@@ -125,5 +127,20 @@ public class RegistrationController {
     @DeleteMapping("/delete/{id}")
     public CommonResult<Boolean> deleteRegistration(@PathVariable Integer id) {
         return registrationService.removeById(id) ? CommonResult.success(true) : CommonResult.error(HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "导出活动报名人数列表")
+    @GetMapping("/export/{activityId}")
+    public void exportRegistrations(@PathVariable Integer activityId, HttpServletResponse response) throws IOException, NoSuchFieldException, ClassNotFoundException, IllegalAccessException {
+        Activity activity = activityService.queryById(activityId);
+        AssertUtils.notNull(activity, HttpStatus.NOT_FOUND, "活动不存在");
+
+        RegistrationQuery query = new RegistrationQuery();
+        query.setActivityId(activityId);
+        query.setStatus(Registration.Status.REGISTERED.getValue());
+        List<RegistrationExportVO> registrations = registrationService.queryAll(-1, -1, query)
+                .stream().map(RegistrationExportVO::of)
+                .collect(Collectors.toCollection(ArrayList::new));
+        ExcelUtils.downloadExcel(response, RegistrationExportVO.class, registrations, activity.getName() + "报名人数列表");
     }
 }

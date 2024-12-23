@@ -2,19 +2,28 @@ package homework.soft.activity.controller;
 
 import homework.soft.activity.annotation.PermissionAuthorize;
 import homework.soft.activity.entity.dto.CommentQuery;
+import homework.soft.activity.entity.po.Activity;
 import homework.soft.activity.entity.po.Comment;
+import homework.soft.activity.entity.vo.CommentExportVO;
 import homework.soft.activity.entity.vo.CommentVO;
+import homework.soft.activity.service.ActivityService;
 import homework.soft.activity.service.CommentService;
+import homework.soft.activity.util.AssertUtils;
 import homework.soft.activity.util.AuthUtils;
+import homework.soft.activity.util.ExcelUtils;
 import homework.soft.activity.util.beans.CommonResult;
 import homework.soft.activity.util.beans.ListResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * (Comment)表控制层
@@ -28,6 +37,8 @@ import java.util.List;
 public class CommentController {
     @Resource
     private CommentService commentService;
+    @Resource
+    private ActivityService activityService;
 
     @Operation(summary = "获取指定信息")
     @GetMapping("/info/{id}")
@@ -77,5 +88,19 @@ public class CommentController {
     @DeleteMapping("/delete/{id}")
     public CommonResult<Boolean> deleteComment(@PathVariable Integer id) {
         return commentService.removeById(id) ? CommonResult.success(true) : CommonResult.error(HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "导出评论")
+    @GetMapping("/export/{activityId}")
+    public void exportComment(@PathVariable Integer activityId, HttpServletResponse response) throws IOException {
+        Activity activity= activityService.getById(activityId);
+        AssertUtils.notNull(activity, HttpStatus.NOT_FOUND, "活动不存在");
+
+        CommentQuery param = new CommentQuery();
+        param.setActivityId(activityId);
+
+        List<CommentExportVO> list = commentService.queryAll(-1,-1, param)
+                .stream().map(CommentExportVO::of).collect(Collectors.toCollection(ArrayList::new));
+        ExcelUtils.downloadExcel(response, CommentExportVO.class, list, activity.getName()+"评论名单");
     }
 }
