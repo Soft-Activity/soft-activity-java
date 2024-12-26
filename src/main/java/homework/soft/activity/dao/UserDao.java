@@ -57,6 +57,7 @@ public interface UserDao extends BaseMapper<User> {
     */
     int insertOrUpdateBatch(@Param("entities") List<User> entities);
 
+    List<UserVO> queryAllAttendance();
 }
 
 

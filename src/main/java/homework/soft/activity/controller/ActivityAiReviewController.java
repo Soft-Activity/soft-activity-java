@@ -32,7 +32,7 @@ public class ActivityAiReviewController {
     @GetMapping("/info/{id}")
     public CommonResult<ActivityAiReviewVO> getActivityAiReview(@PathVariable Integer id) {
         ActivityAiReviewVO vo = activityAiReviewService.queryByIdCache(id);
-        return vo != null ? CommonResult.success(vo) : CommonResult.error(HttpStatus.NOT_FOUND);
+        return vo != null ? CommonResult.success(vo) : CommonResult.success(null);
     }
 
     @Operation(summary = "获取列表")

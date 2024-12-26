@@ -136,5 +136,11 @@ public interface UserService extends IService<User> {
      * @return 是否保存成功
      */
     boolean saveNewUserForAdmin(UserCreateParm param);
+    /**
+     * 查询全勤用户
+     *
+     * @return 全勤用户列表
+     */
+    List<UserVO> queryAllAttendance();
 }
 

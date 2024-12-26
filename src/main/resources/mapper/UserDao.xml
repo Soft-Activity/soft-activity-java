@@ -51,7 +51,7 @@
                 and `gender` = #{gender}
             </if>
             <if test="roleId != null ">
-                and exists(select 1 from `user_role` ur where ur.user_id = user.user_id and ur.role_id = #{roleId})
+                and user_id in (select ur.user_id from `user_role` ur where ur.role_id = #{roleId})
             </if>
         </where>
     </sql>
@@ -69,7 +69,35 @@
         from `user`
         <include refid="queryCondition"/>
     </select>
- 
+    <select id="queryAllAttendance" resultType="homework.soft.activity.entity.vo.UserVO">
+        select
+            u.*
+        from user u
+        where not exists (
+            -- 查找用户未报名的未开始活动
+            select 1
+            from activity a
+            where a.status = 0  -- 未开始的活动
+              and not exists (
+                -- 查找用户的报名记录
+                select 1
+                from registration r
+                where r.activity_id = a.activity_id
+                  and r.student_id = u.user_id
+                  and r.status = 0  -- 报名状态为已报名
+            )
+        )
+          and exists (
+            -- 确保用户至少报名了一个活动
+            select 1
+            from registration r
+                     join activity a on r.activity_id = a.activity_id
+            where r.student_id = u.user_id
+              and a.status = 0
+              and r.status = 0
+        );
+    </select>
+
 
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="userId" useGeneratedKeys="true">

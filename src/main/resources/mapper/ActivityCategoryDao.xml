@@ -88,6 +88,7 @@
                  left join activity a on ac.category_id = a.category_id
         <include refid="queryStatCondition"/>
         group by ac.category_id
+        order by ac.category_id
     </select>
 
 

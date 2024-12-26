@@ -68,6 +68,13 @@ public class UserController {
         return CommonResult.success(new ListResult<>(list, total));
     }
 
+    @Operation(summary = "获取积极用户列表")
+    @GetMapping("/list-all-attendance")
+    public CommonResult<ListResult<UserVO>> getAllAttendanceUsers() {
+        List<UserVO> list = userService.queryAllAttendance();
+        return CommonResult.success(new ListResult<>(list));
+    }
+
     @Operation(summary = "添加用户")
     @PostMapping("/add")
     @PermissionAuthorize(RoleType.SUPER_ADMIN)

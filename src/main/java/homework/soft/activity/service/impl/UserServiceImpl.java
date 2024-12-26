@@ -247,6 +247,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
+    public List<UserVO> queryAllAttendance() {
+        List<UserVO> list = userDao.queryAllAttendance();
+        list.forEach(this::fillVO);
+        return list;
+    }
+
+    @Override
     @Transactional
     public boolean updateUser(String id, UserCreateParm param) {
         param.setUserId(id);
